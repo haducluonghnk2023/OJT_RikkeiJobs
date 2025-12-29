@@ -1,7 +1,8 @@
 import axios from "axios";
 
-// Base URL - có thể move vào .env file sau
-const API_BASE_URL = "http://localhost:8080";
+// Base URL (ưu tiên env; fallback để chạy local)
+// Vite env: VITE_API_BASE_URL (xem `nhom-5/client_admin/env.example`)
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 // Axios instance cho admin API
 export const apiClient = axios.create({
