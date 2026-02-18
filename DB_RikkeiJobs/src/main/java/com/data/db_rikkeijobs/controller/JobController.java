@@ -133,69 +133,11 @@ public class JobController {
         }
 
         @PatchMapping("/{id}")
-        public ResponseEntity<?> patchJob(@PathVariable Long id, @RequestBody Job job) {
+        public ResponseEntity<?> patchJob(@PathVariable Long id, @RequestBody UpdateJobRequest request) {
                 Job existingJob = jobService.findById(id)
                                 .orElseThrow(() -> new HttpNotFound("Job not found with id: " + id));
 
-                // Update only provided fields
-                if (job.getTitle() != null) {
-                        existingJob.setTitle(job.getTitle());
-                }
-                if (job.getQuantity() != null) {
-                        existingJob.setQuantity(job.getQuantity());
-                }
-                if (job.getIndustry() != null) {
-                        existingJob.setIndustry(job.getIndustry());
-                }
-                if (job.getGender() != null) {
-                        existingJob.setGender(job.getGender());
-                }
-                if (job.getSkills() != null) {
-                        existingJob.setSkills(job.getSkills());
-                }
-                if (job.getSalaryCurrent() != null) {
-                        existingJob.setSalaryCurrent(job.getSalaryCurrent());
-                }
-                if (job.getSalary() != null) {
-                        existingJob.setSalary(job.getSalary());
-                }
-                if (job.getProvince() != null) {
-                        existingJob.setProvince(job.getProvince());
-                }
-                if (job.getDistrict() != null) {
-                        existingJob.setDistrict(job.getDistrict());
-                }
-                if (job.getAddress() != null) {
-                        existingJob.setAddress(job.getAddress());
-                }
-                if (job.getWorkingTime() != null) {
-                        existingJob.setWorkingTime(job.getWorkingTime());
-                }
-                if (job.getDeadline() != null) {
-                        existingJob.setDeadline(job.getDeadline());
-                }
-                if (job.getFlight() != null) {
-                        existingJob.setFlight(job.getFlight());
-                }
-                if (job.getEnterpriseId() != null) {
-                        existingJob.setEnterpriseId(job.getEnterpriseId());
-                }
-                if (job.getImage() != null) {
-                        existingJob.setImage(job.getImage());
-                }
-                if (job.getDescriptions() != null) {
-                        existingJob.setDescriptions(job.getDescriptions());
-                }
-                if (job.getRanks() != null) {
-                        existingJob.setRanks(job.getRanks());
-                }
-                if (job.getBenefits() != null) {
-                        existingJob.setBenefits(job.getBenefits());
-                }
-                if (job.getRequirements() != null) {
-                        existingJob.setRequirements(job.getRequirements());
-                }
-
+                jobMapper.updateEntityFromRequest(request, existingJob);
                 JobResponse updatedJob = jobMapper.toResponse(jobService.update(id, existingJob));
 
                 return ResponseEntity.ok(

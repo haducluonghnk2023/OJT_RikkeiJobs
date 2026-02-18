@@ -2,7 +2,7 @@
   <div class="h-full">
     <a-modal
       title="Lịch phỏng vấn"
-      :visible="props.isVisible"
+      :open="props.isVisible"
       @submit="handleUpdate"
       @cancel="handleCancel"
       :footer="null"

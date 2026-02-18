@@ -21,7 +21,8 @@ const router = useRouter();
 
 const goToLogin = () => {
   localStorage.removeItem("token");
-  router.push("/auth");
+  // Cross-port: send user to client login (5173)
+  window.location.href = "http://localhost:5173/login";
 };
 
 const goBack = () => {

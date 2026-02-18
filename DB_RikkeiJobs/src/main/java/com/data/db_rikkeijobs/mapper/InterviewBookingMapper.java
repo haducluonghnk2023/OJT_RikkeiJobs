@@ -6,6 +6,7 @@ import com.data.db_rikkeijobs.dto.response.InterviewBookingResponse;
 import com.data.db_rikkeijobs.entity.InterviewBooking;
 import com.data.db_rikkeijobs.entity.InterviewBookingRank;
 import com.data.db_rikkeijobs.entity.InterviewBookingUpdateTime;
+import com.data.db_rikkeijobs.entity.InterviewBookingStatus;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,9 @@ import java.util.stream.Collectors;
 
 @Component
 public class InterviewBookingMapper {
+    private static boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
+    }
 
     public InterviewBookingResponse toResponse(InterviewBooking interviewBooking) {
         if (interviewBooking == null) {
@@ -54,12 +58,13 @@ public class InterviewBookingMapper {
         InterviewBooking interviewBooking = new InterviewBooking();
         interviewBooking.setEnterpriseId(request.getEnterpriseId());
         interviewBooking.setJobId(request.getJobId());
-        interviewBooking.setTime(request.getTime());
-        interviewBooking.setDate(request.getDate());
+        // Normalize blank strings to null so UI fallback logic works and PATCH doesn't wipe values.
+        interviewBooking.setTime(isBlank(request.getTime()) ? null : request.getTime().trim());
+        interviewBooking.setDate(isBlank(request.getDate()) ? null : request.getDate().trim());
         interviewBooking.setUserId(request.getUserId());
-        interviewBooking.setStatus(request.getStatus() != null ? request.getStatus() : "pending");
+        interviewBooking.setStatus(request.getStatus() != null ? request.getStatus() : InterviewBookingStatus.PENDING);
         interviewBooking.setCreateAt(LocalDateTime.now());
-        interviewBooking.setMeetingLink(request.getMeetingLink());
+        interviewBooking.setMeetingLink(isBlank(request.getMeetingLink()) ? null : request.getMeetingLink().trim());
         // Convert List<String> to List<InterviewBookingUpdateTime>
         if (request.getUpdateStatusTime() != null && !request.getUpdateStatusTime().isEmpty()) {
             List<InterviewBookingUpdateTime> updateTimes = request.getUpdateStatusTime().stream()
@@ -72,9 +77,9 @@ public class InterviewBookingMapper {
                     .collect(Collectors.toList());
             interviewBooking.setUpdateStatusTimes(updateTimes);
         }
-        interviewBooking.setCancelReason(request.getCancelReason());
-        interviewBooking.setInterviewMode(request.getInterviewMode());
-        interviewBooking.setDescription(request.getDescription());
+        interviewBooking.setCancelReason(isBlank(request.getCancelReason()) ? null : request.getCancelReason().trim());
+        interviewBooking.setInterviewMode(isBlank(request.getInterviewMode()) ? null : request.getInterviewMode().trim());
+        interviewBooking.setDescription(isBlank(request.getDescription()) ? null : request.getDescription().trim());
         // Convert List<String> to List<InterviewBookingRank>
         if (request.getRank() != null && !request.getRank().isEmpty()) {
             List<InterviewBookingRank> ranks = request.getRank().stream()
@@ -87,12 +92,12 @@ public class InterviewBookingMapper {
                     .collect(Collectors.toList());
             interviewBooking.setRanks(ranks);
         }
-        interviewBooking.setSkills(request.getSkills());
-        interviewBooking.setProvince(request.getProvince());
-        interviewBooking.setDistrict(request.getDistrict());
-        interviewBooking.setAddress(request.getAddress());
-        interviewBooking.setBenefitsDescription(request.getBenefitsDescription());
-        interviewBooking.setWorkingTime(request.getWorkingTime());
+        interviewBooking.setSkills(isBlank(request.getSkills()) ? null : request.getSkills().trim());
+        interviewBooking.setProvince(isBlank(request.getProvince()) ? null : request.getProvince().trim());
+        interviewBooking.setDistrict(isBlank(request.getDistrict()) ? null : request.getDistrict().trim());
+        interviewBooking.setAddress(isBlank(request.getAddress()) ? null : request.getAddress().trim());
+        interviewBooking.setBenefitsDescription(isBlank(request.getBenefitsDescription()) ? null : request.getBenefitsDescription().trim());
+        interviewBooking.setWorkingTime(isBlank(request.getWorkingTime()) ? null : request.getWorkingTime().trim());
         return interviewBooking;
     }
 
@@ -102,11 +107,11 @@ public class InterviewBookingMapper {
         }
         if (request.getEnterpriseId() != null) interviewBooking.setEnterpriseId(request.getEnterpriseId());
         if (request.getJobId() != null) interviewBooking.setJobId(request.getJobId());
-        if (request.getTime() != null) interviewBooking.setTime(request.getTime());
-        if (request.getDate() != null) interviewBooking.setDate(request.getDate());
+        if (!isBlank(request.getTime())) interviewBooking.setTime(request.getTime().trim());
+        if (!isBlank(request.getDate())) interviewBooking.setDate(request.getDate().trim());
         if (request.getUserId() != null) interviewBooking.setUserId(request.getUserId());
         if (request.getStatus() != null) interviewBooking.setStatus(request.getStatus());
-        if (request.getMeetingLink() != null) interviewBooking.setMeetingLink(request.getMeetingLink());
+        if (!isBlank(request.getMeetingLink())) interviewBooking.setMeetingLink(request.getMeetingLink().trim());
         if (request.getUpdateStatusTime() != null) {
             // Clear existing and set new update times
             interviewBooking.getUpdateStatusTimes().clear();
@@ -122,9 +127,9 @@ public class InterviewBookingMapper {
                 interviewBooking.getUpdateStatusTimes().addAll(updateTimes);
             }
         }
-        if (request.getCancelReason() != null) interviewBooking.setCancelReason(request.getCancelReason());
-        if (request.getInterviewMode() != null) interviewBooking.setInterviewMode(request.getInterviewMode());
-        if (request.getDescription() != null) interviewBooking.setDescription(request.getDescription());
+        if (!isBlank(request.getCancelReason())) interviewBooking.setCancelReason(request.getCancelReason().trim());
+        if (!isBlank(request.getInterviewMode())) interviewBooking.setInterviewMode(request.getInterviewMode().trim());
+        if (!isBlank(request.getDescription())) interviewBooking.setDescription(request.getDescription().trim());
         if (request.getRank() != null) {
             // Clear existing and set new ranks
             interviewBooking.getRanks().clear();
@@ -140,12 +145,12 @@ public class InterviewBookingMapper {
                 interviewBooking.getRanks().addAll(ranks);
             }
         }
-        if (request.getSkills() != null) interviewBooking.setSkills(request.getSkills());
-        if (request.getProvince() != null) interviewBooking.setProvince(request.getProvince());
-        if (request.getDistrict() != null) interviewBooking.setDistrict(request.getDistrict());
-        if (request.getAddress() != null) interviewBooking.setAddress(request.getAddress());
-        if (request.getBenefitsDescription() != null) interviewBooking.setBenefitsDescription(request.getBenefitsDescription());
-        if (request.getWorkingTime() != null) interviewBooking.setWorkingTime(request.getWorkingTime());
+        if (!isBlank(request.getSkills())) interviewBooking.setSkills(request.getSkills().trim());
+        if (!isBlank(request.getProvince())) interviewBooking.setProvince(request.getProvince().trim());
+        if (!isBlank(request.getDistrict())) interviewBooking.setDistrict(request.getDistrict().trim());
+        if (!isBlank(request.getAddress())) interviewBooking.setAddress(request.getAddress().trim());
+        if (!isBlank(request.getBenefitsDescription())) interviewBooking.setBenefitsDescription(request.getBenefitsDescription().trim());
+        if (!isBlank(request.getWorkingTime())) interviewBooking.setWorkingTime(request.getWorkingTime().trim());
     }
     
     // Helper methods to convert between List<String> and List<Entity>

@@ -190,14 +190,15 @@ import { useStore } from "vuex";
 const formRef = ref(null);
 const isSubmitting = ref(false);
 const emit = defineEmits(["cancel"]);
-const userLoginId = ref(JSON.parse(localStorage.getItem("token")));
+const tokenRaw = localStorage.getItem("token");
+const userLoginId = ref(tokenRaw ? JSON.parse(tokenRaw) : null);
 
 const enterpriseData = reactive({
   title: "",
   introduction: "",
   email: "",
   avatar: "https://placehold.co/400",
-  userId: userLoginId,
+  userId: userLoginId.value,
   phoneNumber: "",
   industry: "",
   websiteUrl: "",
@@ -271,9 +272,9 @@ const rules = {
 const cancel = () => {
   emit("cancel");
 };
-const users = computed(() => store.state.login.users);
+const users = computed(() => store.state.auth?.users || []);
 const enterprises = computed(() => store.state.enterprise.enterprises);
-console.log(users, 99999);
+// console.log(users.value, 99999);
 
 const onFinish = (values) => {
   isSubmitting.value = true;
@@ -294,7 +295,7 @@ const onFinish = (values) => {
 };
 onMounted(() => {
   store.dispatch("getAllEnterprise");
-  store.dispatch("getAllUsers");
+  store.dispatch("auth/getAllUsers");
 });
 </script>
 

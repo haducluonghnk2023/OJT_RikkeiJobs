@@ -43,6 +43,8 @@ export const updateUserData = async (updatedUser) => {
 export const getAllUsers = async () => {
   try {
     const response = await apiClient.get(API_ENDPOINTS.USERS);
+    console.log(11111,response);
+    
     return extractResponseData(response);
   } catch (error) {
     handleApiError(error, "lấy danh sách người dùng");

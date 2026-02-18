@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="w-full justify-between flex m-0 h-[50px]">
-      <b class="h-[30px] flex items-center text-[30px]">Nhân viên</b>
+      <b class="h-[30px] flex items-center text-[30px]">Quản lý người dùng</b>
       <!-- <button class="w-[150px] h-[30px] bg-blue-500 rounded-md text-white">
         Thêm mới nhân viên
       </button> -->

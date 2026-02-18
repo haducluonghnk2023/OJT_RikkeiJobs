@@ -328,9 +328,13 @@ const emit = defineEmits(["cancel"]);
 
 const store = useStore();
 const loggedUser = computed(() => {
-  const users = store.state.login.users || [];
-  const loggedUserId = JSON.parse(localStorage.getItem("token"));
-  return users.find((u) => u.id === loggedUserId);
+  const tokenRaw = localStorage.getItem("token");
+  const loggedUserId = tokenRaw ? JSON.parse(tokenRaw) : null;
+  const fromUserModule = store.state.user?.userLogin || null;
+  if (fromUserModule?.id != null) return fromUserModule;
+  const users = store.state.auth?.users || [];
+  if (loggedUserId == null) return null;
+  return users.find((u) => u.id === loggedUserId) || null;
 });
 const route = useRoute();
 const { id } = route.params;

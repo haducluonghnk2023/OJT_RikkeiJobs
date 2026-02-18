@@ -1,6 +1,7 @@
 package com.data.db_rikkeijobs.service.impl;
 
 import com.data.db_rikkeijobs.entity.InterviewBooking;
+import com.data.db_rikkeijobs.entity.InterviewBookingStatus;
 import com.data.db_rikkeijobs.repository.InterviewBookingRepository;
 import com.data.db_rikkeijobs.service.InterviewBookingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ public class InterviewBookingServiceImpl implements InterviewBookingService {
     }
     
     @Override
-    public List<InterviewBooking> findByStatus(String status) {
+    public List<InterviewBooking> findByStatus(InterviewBookingStatus status) {
         return interviewBookingRepository.findByStatus(status);
     }
     

@@ -43,7 +43,7 @@
           <a-select
             mode="tags"
             v-model:value="record.value"
-            :token-separators="['']"
+            :token-separators="[',']"
             @change="(value) => handleChange(record.id, record.type, value)"
             style="width: 100%"
           />
@@ -106,7 +106,17 @@ const showModalAdd = () => {
 const handleOkAdd = () => {
   // Kiểm tra và xử lý các giá trị trống trước khi thêm
   if (newCertificate.type.trim() && newCertificate.value.length > 0) {
-    store.dispatch("addCertificateType", { ...newCertificate });
+    // Backend expects `values: [{ value: string }]`
+    store.dispatch("addCertificateType", {
+      type: newCertificate.type,
+      values: (newCertificate.value || [])
+        .map((v) => ({ value: String(v).trim() }))
+        .filter((v) => v.value),
+      // optional fields for backend entity
+      status: true,
+      code: newCertificate.type.trim().toUpperCase(),
+      language: "en",
+    });
     openAdd.value = false;
 
     // Reset giá trị sau khi thêm
@@ -132,14 +142,16 @@ const handleOkEdit = () => {
   store.dispatch("updateCertificate", {
     id: selectedRecord.value.id,
     type: selectedRecord.value.type,
-    value: selectedRecord.value.value, // Đảm bảo chỉ gửi phần value đã chỉnh sửa
+    values: (selectedRecord.value.value || [])
+      .map((v) => ({ value: String(v).trim() }))
+      .filter((v) => v.value),
   });
 };
 
 const handleChange = (id, type, newValue) => {
   const updateCertificate = {
     type: type,
-    value: newValue,
+    values: (newValue || []).map((v) => ({ value: String(v).trim() })).filter((v) => v.value),
   };
   store.dispatch("updateCertificate", { id: id, ...updateCertificate });
 };

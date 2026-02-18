@@ -126,18 +126,11 @@ public class EnterpriseController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> patchEnterprise(@PathVariable Long id, @RequestBody Enterprise enterprise) {
+    public ResponseEntity<?> patchEnterprise(@PathVariable Long id, @RequestBody UpdateEnterpriseRequest request) {
         Enterprise existingEnterprise = enterpriseService.findById(id)
                 .orElseThrow(() -> new HttpNotFound("Enterprise not found with id: " + id));
         
-        // Update only provided fields
-        if (enterprise.getStatus() != null) {
-            existingEnterprise.setStatus(enterprise.getStatus());
-        }
-        if (enterprise.getTitle() != null) {
-            existingEnterprise.setTitle(enterprise.getTitle());
-        }
-        // Add other fields as needed
+        enterpriseMapper.updateEntityFromRequest(request, existingEnterprise);
         
         EnterpriseResponse updatedEnterprise = enterpriseMapper.toResponse(
                 enterpriseService.update(id, existingEnterprise));

@@ -1,8 +1,11 @@
 package com.data.db_rikkeijobs.controller;
 
+import com.data.db_rikkeijobs.dto.request.CreateCvRequest;
+import com.data.db_rikkeijobs.dto.request.UpdateCvRequest;
 import com.data.db_rikkeijobs.dto.response.ResponseWrapper;
-import com.data.db_rikkeijobs.entity.Cv;
+import com.data.db_rikkeijobs.dto.response.CvResponse;
 import com.data.db_rikkeijobs.exception.HttpNotFound;
+import com.data.db_rikkeijobs.mapper.CvMapper;
 import com.data.db_rikkeijobs.service.CvService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -10,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/cvs")
@@ -18,10 +20,13 @@ import java.util.Map;
 public class CvController {
 
     private final CvService cvService;
+    private final CvMapper cvMapper;
 
     @GetMapping
     public ResponseEntity<?> getAllCvs() {
-        List<Cv> cvs = cvService.findAll();
+        List<CvResponse> cvs = cvService.findAll().stream()
+                .map(cvMapper::toResponse)
+                .toList();
         
         return ResponseEntity.ok(
                 ResponseWrapper.builder()
@@ -35,7 +40,8 @@ public class CvController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getCvById(@PathVariable Long id) {
-        Cv cv = cvService.findById(id)
+        CvResponse cv = cvService.findById(id)
+                .map(cvMapper::toResponse)
                 .orElseThrow(() -> new HttpNotFound("CV not found with id: " + id));
         
         return ResponseEntity.ok(
@@ -48,37 +54,26 @@ public class CvController {
         );
     }
 
+    @PostMapping
+    public ResponseEntity<?> createCv(@RequestBody CreateCvRequest request) {
+        CvResponse created = cvMapper.toResponse(cvService.save(cvMapper.toEntity(request)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.CREATED)
+                        .code(HttpStatus.CREATED.value())
+                        .data(created)
+                        .message("CV created successfully")
+                        .build()
+        );
+    }
+
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateCv(@PathVariable Long id, @RequestBody Cv cv) {
-        Cv existingCv = cvService.findById(id)
+    public ResponseEntity<?> patchCv(@PathVariable Long id, @RequestBody UpdateCvRequest request) {
+        var existingCv = cvService.findById(id)
                 .orElseThrow(() -> new HttpNotFound("CV not found with id: " + id));
-        
-        if (cv.getLanguageId() != null) {
-            existingCv.setLanguageId(cv.getLanguageId());
-        }
-        if (cv.getLanguage() != null) {
-            existingCv.setLanguage(cv.getLanguage());
-        }
-        if (cv.getTitle() != null) {
-            existingCv.setTitle(cv.getTitle());
-        }
-        if (cv.getPdf() != null) {
-            existingCv.setPdf(cv.getPdf());
-        }
-        if (cv.getPdfDataUrl() != null) {
-            existingCv.setPdfDataUrl(cv.getPdfDataUrl());
-        }
-        if (cv.getUserId() != null) {
-            existingCv.setUserId(cv.getUserId());
-        }
-        if (cv.getDate() != null) {
-            existingCv.setDate(cv.getDate());
-        }
-        if (cv.getStatus() != null) {
-            existingCv.setStatus(cv.getStatus());
-        }
-        
-        Cv updatedCv = cvService.update(id, existingCv);
+
+        cvMapper.updateEntityFromRequest(request, existingCv);
+        var updatedCv = cvMapper.toResponse(cvService.update(id, existingCv));
         
         return ResponseEntity.ok(
                 ResponseWrapper.builder()

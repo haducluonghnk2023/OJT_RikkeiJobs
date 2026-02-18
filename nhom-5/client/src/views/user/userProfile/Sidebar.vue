@@ -98,20 +98,28 @@ import {
 import { useRouter } from "vue-router";
 
 const store = useStore();
+const tokenRaw = localStorage.getItem("token");
+const storedUserId = tokenRaw ? JSON.parse(tokenRaw) : null;
 const loggedUser = computed(() => {
-  const users = store.state.login.users;
-  const loggedUserId = JSON.parse(localStorage.getItem("token"));
+  const users = store.state.auth?.users || [];
+  const loggedUserId = storedUserId;
   return users.find((u) => u.id == loggedUserId);
 });
 // console.log(loggedUser);
 const router = useRouter();
-const userLoginId = ref(JSON.parse(localStorage.getItem("token")));
+const userLoginId = ref(storedUserId);
 const getterUser = computed(() => store.getters.User || []);
 const user = computed(() => store.getters.User || []);
 // console.log("test2", user.value);
 onMounted(() => {
-  store.dispatch("getUser", userLoginId.value);
-  router.push(`/profile/information`);
+  if (userLoginId.value != null) {
+    store.dispatch("getUser", userLoginId.value);
+  }
+  // Chỉ redirect khi đang ở /profile (không có child path), không redirect khi đang ở /profile/certificate, /profile/cv, etc.
+  const path = router.currentRoute.value.path;
+  if (path === "/profile" || path === "/profile/") {
+    router.replace("/profile/information");
+  }
 });
 </script>
 

@@ -2,6 +2,7 @@
   <div class="bg-slate-100 w-full">
     <!-- Main content area with overlay -->
     <div class="main-content w-full" :class="{ overlay: isVisible }">
+      <div ref="pageTopRef"></div>
       <div class="w-full">
         <div class="p-5">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -144,12 +145,13 @@ import {
   EnvironmentFilled,
   UserOutlined,
 } from "@ant-design/icons-vue";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 const current = ref(1);
 const perPage = 2; // Items per page
 const isVisible = ref(false);
+const pageTopRef = ref(null);
 const store = useStore();
 const edittedBooking = ref(null);
 const router = useRouter();
@@ -176,7 +178,7 @@ const paginated = computed(() => {
 });
 const Cvs = computed(() => store.state.user.cv);
 
-const users = computed(() => store.state.login.users);
+const users = computed(() => store.state.auth?.users || []);
 
 // Find user by ID
 const findUserById = (id) => {
@@ -238,6 +240,9 @@ const handlePageChange = (page) => {
   console.log(payload, "bbbbbbbbbbbbbbbbbbbb");
 
   store.dispatch("paginatedInterviewBooking", payload);
+  nextTick(() => {
+    pageTopRef.value?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 };
 
 // Watch for changes in interview bookings
@@ -254,7 +259,7 @@ onMounted(() => {
   store.dispatch("getAllInterviewBooking").then(() => {
     handlePageChange(current.value);
   });
-  store.dispatch("getAllUsers");
+  store.dispatch("auth/getAllUsers");
   store.dispatch("getAllJob");
   store.dispatch("getAllEnterprise");
   store.dispatch("getCv");

@@ -1,15 +1,15 @@
 <template>
-  <div class="flex justify-center">
-    <div class="min-h-[478px] w-full bg-[rgba(250,250,250,1)] relative z-10">
+  <div class="bg-[rgba(250,250,250,1)] relative z-10">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
       <div class="absolute top-0 left-0 -z-10">
-        <img src="../../assets/decorJob.svg" alt="" />
+        <img :src="decorJobSvg" alt="" />
       </div>
       <!-- Header -->
-      <div class="flex justify-between items-center mb-8 z-10 mt-10 ml-[130px]">
-        <h2 class="text-2xl font-bold">Ứng viên nổi bật</h2>
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-8 z-10">
+        <h2 class="text-xl sm:text-2xl font-bold">Ứng viên nổi bật</h2>
         <router-link
           to="/homepage/candidate"
-          class="header-item flex items-center mr-[130px]"
+          class="header-item flex items-center"
         >
           Xem tất cả
           <font-awesome-icon
@@ -20,34 +20,31 @@
       </div>
 
       <!-- Candidates Grid -->
-      <div class="flex justify-center">
+      <div v-if="limitedCandidates.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div
-          class="grid grid-cols-1 sm:grid-cols-2 gap-[10px] md:grid-cols-2 lg:grid-cols-4"
+          v-for="candidate in limitedCandidates"
+          :key="candidate.id"
+          class="w-full p-4 gap-4 bg-[rgba(255,255,255,1)] rounded-lg shadow-md"
+          @click="handleClick(candidate.id)"
+          :class="{
+            'cursor-not-allowed':
+              !currentUser || String(currentUser.status || '').toLowerCase() !== 'active',
+            'hover:shadow-lg hover:cursor-pointer':
+              currentUser && String(currentUser.status || '').toLowerCase() === 'active',
+          }"
         >
-          <div
-            v-for="candidate in limitedCandidates"
-            :key="candidate.id"
-            class="w-full h-[222px] p-[20px] gap-[16px] bg-[rgba(255,255,255,1)] rounded-lg shadow-md"
-            @click="handleClick(candidate.id)"
-            :class="{
-              'cursor-not-allowed':
-                !currentUser || currentUser.status !== 'active',
-              'hover:shadow-lg hover:cursor-pointer':
-                currentUser && currentUser.status === 'active',
-            }"
-          >
-            <div class="flex w-full h-[118px] justify-between">
+            <div class="flex w-full justify-between gap-3">
               <div
-                class="gap-[8px] w-[158px] h-[102px] border-[rgba(221,221,221,1)]"
+                class="gap-2 min-w-0"
               >
                 <img
-                  class="w-[52px] h-[52px] img rounded-lg"
+                  class="w-12 h-12 img rounded-lg"
                   :src="candidate.avatar"
                   :alt="candidate.name"
                 />
-                <div class="w-[158px] h-[18px]">
+                <div class="min-w-0">
                   <p
-                    class="text-[rgba(0,0,0,1)] text-[16px] font-semibold w-[158px] h-[18px]"
+                    class="text-[rgba(0,0,0,1)] text-[16px] font-semibold truncate"
                   >
                     {{ candidate.fullName }}
                   </p>
@@ -58,7 +55,7 @@
               </div>
               <p
                 :class="[
-                  'w-[107px] text-[12px] h-[22px] flex items-center justify-center rounded-xl',
+                  'px-3 text-[12px] h-[22px] flex items-center justify-center rounded-xl shrink-0',
                   {
                     'bg-[rgba(236,253,243,1)] text-[rgba(2,122,72,1)] ':
                       candidate.position === 'Project Manager',
@@ -82,8 +79,8 @@
 
             <!--  -->
             <div>
-              <div class="w-full h-[48px]">
-                <div class="w-full flex h-[20px] mb-[8px]">
+              <div class="w-full">
+                <div class="w-full flex mb-2">
                   <div class="flex items-center w-[16px] h-[16px]">
                     <font-awesome-icon
                       :icon="['fas', 'graduation-cap']"
@@ -91,21 +88,21 @@
                     />
                   </div>
 
-                  <div class="w-[116px] h-[20px] flex gap-[20px] ml-[10px]">
+                  <div class="flex gap-3 ml-2 min-w-0">
                     <p
-                      class="text-[rgba(45,44,44,1)] text-[14px] w-[70px] h-[20px] lv"
+                      class="text-[rgba(45,44,44,1)] text-[14px] min-w-[70px] lv"
                     >
                       Trình độ:
                     </p>
                     <p
-                      class="w-[41px] h-[20px] text-[rgba(103,103,103,1)] flex items-center"
+                      class="text-[rgba(103,103,103,1)] flex items-center truncate"
                     >
                       {{ candidate.level }}
                     </p>
                   </div>
                 </div>
 
-                <div class="flex w-[242px] h-[20px]">
+                <div class="flex">
                   <div class="flex items-center w-[16px] h-[16px]">
                     <font-awesome-icon
                       :icon="['fas', 'box-archive']"
@@ -113,7 +110,7 @@
                     />
                   </div>
 
-                  <div class="w-[156px] h-[20px] flex ml-[10px]">
+                  <div class="flex ml-2 min-w-0">
                     <p
                       class="text-[rgba(45,44,44,1)] text-[14px] min-w-[80px] h-[20px] lv"
                     >
@@ -125,7 +122,7 @@
                         1
                       )"
                       :key="index"
-                      class="w-[65px] ml-0 h-[20px] text-[rgba(103,103,103,1)] flex items-center"
+                      class="ml-0 h-[20px] text-[rgba(103,103,103,1)] flex items-center truncate"
                     >
                       {{ edu }}
                     </p>
@@ -134,7 +131,9 @@
               </div>
             </div>
           </div>
-        </div>
+      </div>
+      <div v-else class="text-gray-500 text-sm text-center py-8">
+        Chưa có ứng viên nổi bật để hiển thị.
       </div>
       <!--  -->
     </div>
@@ -142,19 +141,19 @@
 </template>
 
 <script setup>
-import candidate from "@/store/modules/candidate.module";
 import { computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
+import decorJobSvg from "@/assets/decorJob.svg";
 
 const router = useRouter();
 const store = useStore();
 
-const candidates = computed(() => store.state.candidate.candidates);
-// console.log(candidates.value, 999999);
+// candidates list (always array)
+const candidates = computed(() => store.state.candidate?.candidates || []);
 
 const handleClick = (id) => {
-  if (!currentUser || currentUser.value.status !== "active") {
+  if (!currentUser.value || String(currentUser.value?.status || "").toLowerCase() !== "active") {
     return;
   }
   router.push(`/homepage/candidate/candidateDetail/${id}`);
@@ -174,16 +173,16 @@ const calculateAge = (birthdate) => {
   return age;
 };
 const limitedCandidates = computed(() => {
-  const candidates = store.state.candidate.candidates;
-  const returnCandidate = candidates.filter((c) => c.role === "user"); // Lọc chỉ các ứng viên có role là "user"
+  const returnCandidate = candidates.value.filter(
+    (c) =>
+      c?.role === "user" &&
+      String(c?.status || "").toLowerCase() === "active"
+  );
   return returnCandidate.slice(0, 4); // Lấy tối đa 4 ứng viên
 });
 
-const userId = JSON.parse(localStorage.getItem("token"));
-const users = computed(() => store.state.login.users);
-const currentUser = computed(() => {
-  return users.value.find((user) => user.id === userId);
-});
+// current logged-in user comes from `user` module (set by Header.vue)
+const currentUser = computed(() => store.state.user?.userLogin || null);
 
 onMounted(() => {
   store.dispatch("getAllCandidates");

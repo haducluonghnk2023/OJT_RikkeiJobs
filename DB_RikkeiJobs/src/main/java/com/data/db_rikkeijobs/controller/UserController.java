@@ -29,16 +29,50 @@ public class UserController {
     @GetMapping
     public ResponseEntity<?> getAllUsers(
             @RequestParam(required = false) Integer _page,
-            @RequestParam(required = false) Integer _limit) {
+            @RequestParam(required = false) Integer _limit,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String role,
+            @RequestParam(required = false) String _sort,
+            @RequestParam(required = false) String _order) {
+        List<User> sourceUsers = userService.findAll();
+
+        if (status != null && !status.isBlank()) {
+            final String s = status.trim();
+            sourceUsers = sourceUsers.stream()
+                    .filter(u -> u.getStatus() != null && u.getStatus().equalsIgnoreCase(s))
+                    .collect(Collectors.toList());
+        }
+
+        if (role != null && !role.isBlank()) {
+            final String r = role.trim();
+            sourceUsers = sourceUsers.stream()
+                    .filter(u -> u.getRole() != null && u.getRole().equalsIgnoreCase(r))
+                    .collect(Collectors.toList());
+        }
+
+        if (_sort != null && _sort.equalsIgnoreCase("id")) {
+            boolean desc = _order != null && _order.equalsIgnoreCase("DESC");
+            sourceUsers = sourceUsers.stream()
+                    .sorted((a, b) -> {
+                        Long aId = a.getId();
+                        Long bId = b.getId();
+                        if (aId == null && bId == null) return 0;
+                        if (aId == null) return 1;
+                        if (bId == null) return -1;
+                        return desc ? bId.compareTo(aId) : aId.compareTo(bId);
+                    })
+                    .collect(Collectors.toList());
+        }
+
         List<UserResponse> users;
         
         if (_page != null && _limit != null) {
-            int totalUsers = userService.findAll().size();
+            int totalUsers = sourceUsers.size();
             int start = (_page - 1) * _limit;
             int end = Math.min(start + _limit, totalUsers);
             
-            users = userService.findAll().stream()
-                    .skip(start)
+            users = sourceUsers.stream()
+                    .skip(Math.max(0, start))
                     .limit(_limit)
                     .map(userMapper::toResponse)
                     .collect(Collectors.toList());
@@ -52,7 +86,7 @@ public class UserController {
                             .message("Users retrieved successfully")
                             .build());
         } else {
-            users = userService.findAll().stream()
+            users = sourceUsers.stream()
                     .map(userMapper::toResponse)
                     .collect(Collectors.toList());
             

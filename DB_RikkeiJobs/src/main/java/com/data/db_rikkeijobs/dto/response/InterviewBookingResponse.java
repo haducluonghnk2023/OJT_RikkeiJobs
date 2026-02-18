@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.data.db_rikkeijobs.entity.InterviewBookingStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,7 +20,7 @@ public class InterviewBookingResponse {
     private String time;
     private String date;
     private Long userId;
-    private String status;
+    private InterviewBookingStatus status;
     private LocalDateTime createAt;
     private String meetingLink;
     private List<String> updateStatusTime;

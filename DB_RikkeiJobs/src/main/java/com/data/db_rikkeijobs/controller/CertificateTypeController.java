@@ -1,8 +1,11 @@
 package com.data.db_rikkeijobs.controller;
 
+import com.data.db_rikkeijobs.dto.request.CreateCertificateTypeRequest;
+import com.data.db_rikkeijobs.dto.request.UpdateCertificateTypeRequest;
 import com.data.db_rikkeijobs.dto.response.ResponseWrapper;
 import com.data.db_rikkeijobs.entity.CertificateType;
 import com.data.db_rikkeijobs.exception.HttpNotFound;
+import com.data.db_rikkeijobs.mapper.CertificateTypeMapper;
 import com.data.db_rikkeijobs.service.CertificateTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,6 +20,7 @@ import java.util.List;
 public class CertificateTypeController {
 
     private final CertificateTypeService certificateTypeService;
+    private final CertificateTypeMapper certificateTypeMapper;
 
     @GetMapping
     public ResponseEntity<?> getAllCertificateTypes() {
@@ -48,8 +52,10 @@ public class CertificateTypeController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createCertificateType(@RequestBody CertificateType newCerti) {
-        CertificateType createdCertificateType = certificateTypeService.save(newCerti);
+    public ResponseEntity<?> createCertificateType(@RequestBody CreateCertificateTypeRequest request) {
+        CertificateType createdCertificateType = certificateTypeService.save(
+                certificateTypeMapper.toEntity(request)
+        );
         
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 ResponseWrapper.builder()
@@ -62,25 +68,11 @@ public class CertificateTypeController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateCertificateType(@PathVariable Long id, @RequestBody CertificateType updatedCerti) {
+    public ResponseEntity<?> updateCertificateType(@PathVariable Long id, @RequestBody UpdateCertificateTypeRequest request) {
         CertificateType existingCertificateType = certificateTypeService.findById(id)
                 .orElseThrow(() -> new HttpNotFound("Certificate type not found with id: " + id));
         
-        if (updatedCerti.getType() != null) {
-            existingCertificateType.setType(updatedCerti.getType());
-        }
-        if (updatedCerti.getLanguage() != null) {
-            existingCertificateType.setLanguage(updatedCerti.getLanguage());
-        }
-        if (updatedCerti.getStatus() != null) {
-            existingCertificateType.setStatus(updatedCerti.getStatus());
-        }
-        if (updatedCerti.getCode() != null) {
-            existingCertificateType.setCode(updatedCerti.getCode());
-        }
-        if (updatedCerti.getValues() != null) {
-            existingCertificateType.setValues(updatedCerti.getValues());
-        }
+        certificateTypeMapper.updateEntityFromRequest(request, existingCertificateType);
         
         CertificateType updatedCertificateType = certificateTypeService.update(id, existingCertificateType);
         

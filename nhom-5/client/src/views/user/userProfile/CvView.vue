@@ -1,5 +1,6 @@
 <template>
   <div class="relative w-full h-full">
+    <div ref="pageTopRef"></div>
     <div
       class="fixed inset-0 bg-gray-800 bg-opacity-50 z-10"
       v-if="isAddModalOpen || isEditModalOpen"
@@ -35,7 +36,7 @@
               Hãy xem và cập nhật CV mới nhất của bạn
             </p>
           </div>
-          <div class="mr-[100px]">
+          <div>
             <button
               @click="isAddModalOpen = true"
               class="bg-[#f8e9ea] gap-[4px] text-[#ab1f24] flex items-center justify-center border-0 w-[150px] h-[48px] font-[700] text-[16px] rounded-md"
@@ -45,7 +46,7 @@
           </div>
         </div>
 
-        <di v class="grid grid-cols-3 gap-5 mb-[10px] mr-[80px]">
+        <div class="grid grid-cols-3 gap-5 mb-[10px]">
           <div v-for="cv in paginatedCv" :key="cv.id" class="relative">
             <a-badge-ribbon
               :text="cv.status ? 'đạt yêu cầu ' : 'đang xử lý'"
@@ -99,7 +100,7 @@
               </template>
             </a-card>
           </div>
-        </di>
+        </div>
 
         <a-pagination
           v-if="cv.length > 0"
@@ -108,7 +109,7 @@
           :page-size="pageSize"
           @change="handlePageChange"
           show-less-items
-          class="text-end mr-[100px]"
+          class="text-end"
         />
       </div>
     </div>
@@ -116,7 +117,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, nextTick, onMounted } from "vue";
 import { useStore } from "vuex";
 import EditCertificateModel from "@/components/userModal/EditCertificateModel.vue";
 import AddCvModal from "@/components/userModal/AddCvModal.vue";
@@ -134,6 +135,7 @@ const isAddModalOpen = ref(false);
 const isEditModalOpen = ref(false);
 const current = ref(1);
 const pageSize = ref(6);
+const pageTopRef = ref(null);
 
 const cv = computed(() => store.getters.Cv);
 
@@ -168,6 +170,9 @@ const handlePageChange = (page, pagesize) => {
   current.value = page;
   pageSize.value = pagesize;
   console.log(page, pagesize);
+  nextTick(() => {
+    pageTopRef.value?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 };
 
 onMounted(async () => {

@@ -3,10 +3,6 @@ import { API_ENDPOINTS } from "@/config/constants";
 import { handleApiError } from "@/utils/errorHandler";
 import { extractResponseData } from "@/utils/apiHelper";
 
-/**
- * Get all users (for login/authentication)
- * @returns {Promise<Array>} Array of users
- */
 export const getAllUsers = async () => {
   try {
     const response = await apiClient.get(API_ENDPOINTS.USERS);
@@ -17,11 +13,6 @@ export const getAllUsers = async () => {
   }
 };
 
-/**
- * Register new user
- * @param {Object} userData - User registration data (email, userName, password)
- * @returns {Promise<Object>} Created user data
- */
 export const register = async (userData) => {
   try {
     const response = await apiClient.post(API_ENDPOINTS.REGISTER, userData);
@@ -43,6 +34,21 @@ export const login = async (credentials) => {
     return extractResponseData(response);
   } catch (error) {
     handleApiError(error, "đăng nhập");
+    throw error;
+  }
+};
+
+/**
+ * Logout (server clears cookies/session if any)
+ * @returns {Promise<Object>} Response wrapper data (if any)
+ */
+export const logout = async () => {
+  try {
+    const response = await apiClient.post(API_ENDPOINTS.LOGOUT);
+    return extractResponseData(response);
+  } catch (error) {
+    // Logout should be best-effort; still bubble so caller can ignore if desired
+    handleApiError(error, "đăng xuất");
     throw error;
   }
 };

@@ -32,7 +32,7 @@
               Hãy xem và cập nhật chứng chỉ của bạn
             </p>
           </div>
-          <div class="mr-[100px]">
+          <div>
             <button
               @click="isAddModalOpen = true"
               class="bg-[#f8e9ea] gap-[4px] text-[#ab1f24] flex items-center justify-center border-0 w-[200px] h-[48px] font-[600] text-[16px] rounded-md"
@@ -44,7 +44,7 @@
       </div>
 
       <!-- Table -->
-      <div class="mr-[100px]">
+      <div>
         <a-table
           :columns="columns"
           :data-source="data"

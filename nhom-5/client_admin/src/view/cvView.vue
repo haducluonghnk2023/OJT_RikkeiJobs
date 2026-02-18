@@ -3,7 +3,7 @@
     <context-holder />
 
     <div class="flex justify-between px-5">
-      <h1 class="font-bold text-3xl">CV người dùng</h1>
+      <h1 class="font-bold text-3xl">Quản lý CV</h1>
     </div>
     <a-divider class="my-3 bg-red-600"></a-divider>
     <a-input
@@ -135,13 +135,21 @@ const pag = reactive({
 });
 
 const handleActivate = async (record) => {
-  messageApi.success("Cập nhật trạng thái thành công!");
-  await store.dispatch("updateCvStatus", { id: record.id, status: true });
+  try {
+    await store.dispatch("updateCvStatus", { id: record.id, status: true });
+    messageApi.success("Cập nhật trạng thái thành công!");
+  } catch (e) {
+    messageApi.error("Cập nhật trạng thái thất bại!");
+  }
 };
 
 const handleDeactivate = async (record) => {
-  messageApi.success("Cập nhật trạng thái thành công!");
-  await store.dispatch("updateCvStatus", { id: record.id, status: false });
+  try {
+    await store.dispatch("updateCvStatus", { id: record.id, status: false });
+    messageApi.success("Cập nhật trạng thái thành công!");
+  } catch (e) {
+    messageApi.error("Cập nhật trạng thái thất bại!");
+  }
 };
 const handleDelete = (cvId) => {
   console.log(cvId);

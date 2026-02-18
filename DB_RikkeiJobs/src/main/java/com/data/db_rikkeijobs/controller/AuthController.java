@@ -4,51 +4,25 @@ import com.data.db_rikkeijobs.dto.request.LoginRequest;
 import com.data.db_rikkeijobs.dto.request.RegisterRequest;
 import com.data.db_rikkeijobs.dto.response.ResponseWrapper;
 import com.data.db_rikkeijobs.dto.response.UserResponse;
-import com.data.db_rikkeijobs.entity.User;
-import com.data.db_rikkeijobs.exception.HttpConflict;
-import com.data.db_rikkeijobs.exception.HttpUnauthorized;
-import com.data.db_rikkeijobs.mapper.UserMapper;
-import com.data.db_rikkeijobs.service.UserService;
+import com.data.db_rikkeijobs.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final UserService userService;
-    private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
+    private final AuthService authService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
-        if (userService.existsByEmail(request.getEmail())) {
-            throw new HttpConflict("Email already exists: " + request.getEmail());
-        }
-
-        if (userService.findByUserName(request.getUserName()).isPresent()) {
-            throw new HttpConflict("Username already exists: " + request.getUserName());
-        }
-
-        User user = new User();
-        user.setEmail(request.getEmail());
-        user.setUserName(request.getUserName());
-        user.setPassword(request.getPassword());
-        user.setFirstName(null);
-        user.setFullName(null);
-        user.setStatus("Active");
-        user.setRole("user");
-        user.setLock(false);
-        user.setCreateAt(java.time.LocalDateTime.now());
-
-        UserResponse createdUser = userMapper.toResponse(userService.save(user));
+        UserResponse createdUser = authService.register(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 ResponseWrapper.builder()
@@ -62,26 +36,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
-        Optional<User> userOptional = userService.findByEmail(request.getEmail());
-        if (userOptional.isEmpty()) {
-            throw new HttpUnauthorized("Invalid email or password");
-        }
-
-        User user = userOptional.get();
-
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new HttpUnauthorized("Invalid email or password");
-        }
-
-        if (Boolean.TRUE.equals(user.getLock())) {
-            throw new HttpUnauthorized("Account is locked");
-        }
-
-        if ("inActive".equals(user.getStatus())) {
-            throw new HttpUnauthorized("Account is inactive");
-        }
-
-        UserResponse userResponse = userMapper.toResponse(user);
+        UserResponse userResponse = authService.login(request);
 
         return ResponseEntity.ok(
                 ResponseWrapper.builder()
@@ -89,6 +44,29 @@ public class AuthController {
                         .code(HttpStatus.OK.value())
                         .data(userResponse)
                         .message("Login successful")
+                        .build()
+        );
+    }
+
+    /**
+     * Logout endpoint to clear any server-side session and delete session/auth cookies.
+     * Note: JS cannot reliably remove HttpOnly cookies; must be done by server Set-Cookie.
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        authService.logout(request);
+
+        ResponseEntity.BodyBuilder builder = ResponseEntity.ok();
+        for (ResponseCookie cleared : authService.buildLogoutCookies()) {
+            builder.header("Set-Cookie", cleared.toString());
+        }
+
+        return builder.body(
+                ResponseWrapper.builder()
+                        .status(HttpStatus.OK)
+                        .code(HttpStatus.OK.value())
+                        .data(null)
+                        .message("Logout successful")
                         .build()
         );
     }

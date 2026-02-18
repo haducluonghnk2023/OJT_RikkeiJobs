@@ -1,5 +1,42 @@
 import { getUserById } from "@/apis/userApi";
 
+const extractTokenFromRoute = (to) => {
+  // Support /admin?token=... and /auth?token=...
+  const tokenFromQuery = to?.query?.token;
+  if (tokenFromQuery !== undefined && tokenFromQuery !== null && String(tokenFromQuery).trim() !== "") {
+    return String(tokenFromQuery).trim();
+  }
+
+  // Fallback: support #/admin?token=... style hashes if someone uses hash mode
+  const hash = typeof window !== "undefined" ? window.location.hash : "";
+  if (hash && hash.includes("token=")) {
+    const qs = hash.includes("?") ? hash.split("?")[1] : "";
+    const params = new URLSearchParams(qs);
+    const t = params.get("token");
+    if (t && t.trim() !== "") return t.trim();
+  }
+
+  return null;
+};
+
+const persistTokenFromRouteIfAny = (to) => {
+  const incoming = extractTokenFromRoute(to);
+  if (!incoming) return null;
+
+  localStorage.setItem("token", incoming);
+
+  // Clean token from URL to avoid leaking it in screenshots/logs/history.
+  try {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("token");
+    window.history.replaceState({}, "", url.toString());
+  } catch {
+    // ignore
+  }
+
+  return incoming;
+};
+
 /**
  * Guard để kiểm tra quyền admin
  * @param {Object} to - Route object
@@ -7,6 +44,9 @@ import { getUserById } from "@/apis/userApi";
  * @param {Function} next - Next function
  */
 export const adminGuard = async (to, from, next) => {
+  // Allow SSO-style token handoff from client (5173) -> admin (5174)
+  persistTokenFromRouteIfAny(to);
+
   const token = localStorage.getItem("token");
 
   // Nếu không có token, chuyển đến trang login
@@ -58,6 +98,8 @@ export const adminGuard = async (to, from, next) => {
  * @param {Function} next - Next function
  */
 export const authGuard = (to, from, next) => {
+  // If token is passed on /auth?token=..., persist it then go straight to /admin
+  persistTokenFromRouteIfAny(to);
   const token = localStorage.getItem("token");
 
   // Nếu đã có token, chuyển đến trang admin

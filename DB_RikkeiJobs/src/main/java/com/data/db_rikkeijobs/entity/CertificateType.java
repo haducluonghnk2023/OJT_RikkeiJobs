@@ -1,5 +1,7 @@
 package com.data.db_rikkeijobs.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +15,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CertificateType {
     
     @Id
@@ -24,6 +27,7 @@ public class CertificateType {
     
     // Quan hệ One-to-Many với CertificateTypeValue
     @OneToMany(mappedBy = "certificateType", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<CertificateTypeValue> values = new ArrayList<>();
     
     @Column(name = "language")

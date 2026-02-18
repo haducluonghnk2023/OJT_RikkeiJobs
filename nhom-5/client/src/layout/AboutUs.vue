@@ -76,7 +76,7 @@
       </div>
       <img
         class="absolute top-[650px] left-0 z-[-1]"
-        src="../assets/banner/decor4.svg"
+        :src="decor4Svg"
         alt=""
       />
     </div>
@@ -172,11 +172,11 @@
       </div>
       <div>
         <div class="main-logo">
-          <img src="../assets/rk/rk.svg" alt="Rikkei Main Logo" />
+          <img :src="rkSvg" alt="Rikkei Main Logo" />
         </div>
       </div>
       <div class="absolute top-0 right-0 z-[-1]">
-        <img src="../assets/rk/dc.svg" alt="" />
+        <img :src="dcSvg" alt="" />
       </div>
     </div>
     <Footer />
@@ -186,6 +186,9 @@
 <script setup>
 import Header from "./Header.vue";
 import Footer from "./Footer.vue";
+import decor4Svg from "@/assets/banner/decor4.svg";
+import rkSvg from "@/assets/rk/rk.svg";
+import dcSvg from "@/assets/rk/dc.svg";
 </script>
 
 <style scoped>

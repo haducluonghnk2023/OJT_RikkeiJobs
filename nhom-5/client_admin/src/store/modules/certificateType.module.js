@@ -10,11 +10,37 @@ const certificateTypes = {
     certificateTypes: [],
   },
   getters: {
-    allCertificateTypes: (state) => state.certificateTypes,
+    // Normalize API shape for UI:
+    // Backend returns `values: [{ id, certificateTypeId, value, ... }]`
+    // UI expects `value: string[]` for <a-select mode="tags">
+    allCertificateTypes: (state) =>
+      (state.certificateTypes || []).map((cert) => {
+        const raw = cert?.value ?? cert?.values ?? [];
+        const arr = Array.isArray(raw) ? raw : [];
+
+        const value = arr
+          .map((v) => (typeof v === "string" ? v : v?.value))
+          .filter((v) => typeof v === "string" && v.trim() !== "");
+
+        return {
+          ...cert,
+          value,
+        };
+      }),
   },
   mutations: {
     setCertificateTypes(state, certificateTypes) {
-      state.certificateTypes = certificateTypes;
+      // Ensure state is always an array
+      if (Array.isArray(certificateTypes)) {
+        state.certificateTypes = certificateTypes;
+      } else if (Array.isArray(certificateTypes?.data)) {
+        // Defensive: in case caller passes ResponseWrapper by mistake
+        state.certificateTypes = certificateTypes.data;
+      } else if (certificateTypes) {
+        state.certificateTypes = [certificateTypes];
+      } else {
+        state.certificateTypes = [];
+      }
     },
     updateCertificateType(state, updateCertificate) {
       const index = state.certificateTypes.findIndex(
@@ -36,7 +62,15 @@ const certificateTypes = {
   actions: {
     async getCertificateTypes({ commit }) {
       const data = await getCertificateTypesData();
-      commit("setCertificateTypes", data);
+      // Defensive: guarantee we commit an array
+      const normalized = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.data)
+          ? data.data
+          : data
+            ? [data]
+            : [];
+      commit("setCertificateTypes", normalized);
     },
     async addCertificateType({ commit }, newCertificate) {
       const data = await addCertificateTypeData(newCertificate);

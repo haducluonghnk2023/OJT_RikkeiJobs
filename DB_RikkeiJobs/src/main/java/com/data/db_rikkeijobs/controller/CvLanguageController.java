@@ -1,5 +1,6 @@
 package com.data.db_rikkeijobs.controller;
 
+import com.data.db_rikkeijobs.dto.request.UpdateCvLanguageRequest;
 import com.data.db_rikkeijobs.dto.response.ResponseWrapper;
 import com.data.db_rikkeijobs.entity.CvLanguage;
 import com.data.db_rikkeijobs.exception.HttpNotFound;
@@ -10,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/cvLanguages")
@@ -63,19 +63,13 @@ public class CvLanguageController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateCvLanguage(@PathVariable Long id, @RequestBody CvLanguage updatedLanguage) {
+    public ResponseEntity<?> updateCvLanguage(@PathVariable Long id, @RequestBody UpdateCvLanguageRequest request) {
         CvLanguage existingCvLanguage = cvLanguageService.findById(id)
                 .orElseThrow(() -> new HttpNotFound("CV language not found with id: " + id));
         
-        if (updatedLanguage.getLanguage() != null) {
-            existingCvLanguage.setLanguage(updatedLanguage.getLanguage());
-        }
-        if (updatedLanguage.getCode() != null) {
-            existingCvLanguage.setCode(updatedLanguage.getCode());
-        }
-        if (updatedLanguage.getStatus() != null) {
-            existingCvLanguage.setStatus(updatedLanguage.getStatus());
-        }
+        if (request.getLanguage() != null) existingCvLanguage.setLanguage(request.getLanguage());
+        if (request.getCode() != null) existingCvLanguage.setCode(request.getCode());
+        if (request.getStatus() != null) existingCvLanguage.setStatus(request.getStatus());
         
         CvLanguage updatedCvLanguage = cvLanguageService.update(id, existingCvLanguage);
         

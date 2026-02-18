@@ -107,10 +107,12 @@
               Ứng tuyển ngay
             </p>
             <p
-              class="w-[165px] h-[40px] bg-[rgba(255,255,255,1)] border-2 border-[rgba(103,103,103,1)] gap-[8px] text-[rgba(103,103,103,1)] rounded-md justify-center items-center flex"
+              @click="toggleFavorite(job?.id)"
+              class="w-[165px] h-[40px] bg-[rgba(255,255,255,1)] border-2 gap-[8px] rounded-md justify-center items-center flex hover:cursor-pointer transition-colors"
+              :class="isFavoriteJob ? 'border-red-400 text-red-600 bg-red-50' : 'border-[rgba(103,103,103,1)] text-[rgba(103,103,103,1)]'"
             >
-              <font-awesome-icon :icon="['fas', 'heart']" />
-              Lưu tin
+              <font-awesome-icon :icon="['fas', 'heart']" :class="isFavoriteJob ? 'text-red-600' : ''" />
+              {{ isFavoriteJob ? 'Đã lưu' : 'Lưu tin' }}
             </p>
           </div>
         </div>
@@ -146,7 +148,7 @@
                   <p
                     class="w-[128px] h-[24px] ml-0 text-[rgba(17,17,17,1)] text-[16px] font-bold mb-0"
                   >
-                    {{ job?.salary }} {{ job?.salaryCurrent }}
+                    {{ formatSalary(job?.salary, job?.salaryCurrent) }}
                   </p>
                 </div>
               </div>
@@ -346,10 +348,12 @@
             Ứng tuyển ngay
           </p>
           <p
-            class="w-[165px] h-[40px] hover:cursor-pointer bg-[rgba(255,255,255,1)] border-2 border-[rgba(103,103,103,1)] gap-[8px] text-[rgba(103,103,103,1)] rounded-md justify-center items-center flex"
+            @click="toggleFavorite(job?.id)"
+            class="w-[165px] h-[40px] hover:cursor-pointer bg-[rgba(255,255,255,1)] border-2 gap-[8px] rounded-md justify-center items-center flex transition-colors"
+            :class="isFavoriteJob ? 'border-red-400 text-red-600 bg-red-50' : 'border-[rgba(103,103,103,1)] text-[rgba(103,103,103,1)]'"
           >
-            <font-awesome-icon :icon="['fas', 'heart']" />
-            Lưu tin
+            <font-awesome-icon :icon="['fas', 'heart']" :class="isFavoriteJob ? 'text-red-600' : ''" />
+            {{ isFavoriteJob ? 'Đã lưu' : 'Lưu tin' }}
           </p>
         </div>
       </div>
@@ -425,7 +429,7 @@
                   <font-awesome-icon :icon="['fas', 'money-bill']" />
                 </i>
                 <span class="text-[12px] h-[18px] font-[400] truncate"
-                  >{{ job.salary }} {{ job.salaryCurrent }}</span
+                  >{{ formatSalary(job.salary, job.salaryCurrent) }}</span
                 >
               </div>
               <div class="flex items-center w-[135px]">
@@ -457,9 +461,12 @@
 
             <!-- Bookmark Icon -->
             <button
-              class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+              type="button"
+              @click.stop="toggleFavorite(job.id)"
+              class="absolute top-4 right-4 flex justify-center items-center transition-colors"
+              :class="isFavorite(job.id) ? 'text-red-500' : 'text-gray-400 hover:text-gray-600'"
             >
-              <i class="far fa-heart text-lg"></i>
+              <font-awesome-icon :icon="['fas', 'heart']" :class="isFavorite(job.id) ? 'text-red-500' : ''" class="text-lg" />
             </button>
 
             <!-- Badge Icon (optional if needed) -->
@@ -480,6 +487,7 @@ import { useRoute, useRouter } from "vue-router";
 import { message } from "ant-design-vue";
 import { apiClient } from "@/config/axios";
 import { API_ENDPOINTS } from "@/config/constants";
+import { formatSalary } from "@/utils/formatters";
 const store = useStore();
 const route = useRoute();
 const router = useRouter();
@@ -491,13 +499,17 @@ const itvs = computed(() => store.state.interviewBooking.interviewBookings);
 const job = computed(() => {
   return jobs.value.find((job) => job.id == jobId.value);
 });
-const userId = JSON.parse(localStorage.getItem("token"));
+const tokenRaw = localStorage.getItem("token");
+const storedUserId = tokenRaw ? JSON.parse(tokenRaw) : null;
+
+// Prefer current user from `user` module (loaded by Header.vue). Fallback to auth users list if present.
 const loggedUser = computed(() => {
-  const users = store.state.login.users;
-  const loggedUserId = JSON.parse(localStorage.getItem("token"));
-  return users.find((u) => u.id == loggedUserId);
+  const fromUserModule = store.state.user?.userLogin || null;
+  if (fromUserModule?.id != null) return fromUserModule;
+  const users = store.state.auth?.users || [];
+  if (storedUserId == null) return null;
+  return users.find((u) => u.id == storedUserId) || null;
 });
-console.log(loggedUser);
 
 const jobRankDuration = computed(() => {
   if (job.value && job.value.skills) {
@@ -597,19 +609,23 @@ watch(
 
 const hasApplied = computed(() => {
   return itvs.value.some(
-    (itv) => itv.userId == userId && itv.jobId == jobId.value
+    (itv) => itv.userId == storedUserId && itv.jobId == jobId.value
   );
 });
+
+const isFavoriteJob = computed(() =>
+  store.getters["favorites/isFavorite"]?.(job.value?.id) ?? false
+);
+const isFavorite = (id) => store.getters["favorites/isFavorite"]?.(id) ?? false;
+const toggleFavorite = (id) => {
+  if (id) store.dispatch("favorites/toggleFavorite", id);
+};
 
 const handleClick = async (jobId) => {
   router.push(`/homepage/listJob/jobDetail/${jobId}`);
 };
 
-const currentUser = computed(() => {
-  const users = store.state.login.users;
-  const userId = JSON.parse(localStorage.getItem("token"));
-  return users.find((u) => u.id == userId);
-});
+const currentUser = loggedUser;
 
 const applyForJob = async () => {
   // Kiểm tra xem người dùng đã đăng nhập hay chưa
@@ -667,7 +683,7 @@ const applyForJob = async () => {
 onMounted(async () => {
   await store.dispatch("getAllJobs");
   await store.dispatch("getAllInterviewBooking");
-  await store.dispatch("getAllUsers");
+  await store.dispatch("auth/getAllUsers");
   await store.dispatch("getCvCdd");
 });
 </script>

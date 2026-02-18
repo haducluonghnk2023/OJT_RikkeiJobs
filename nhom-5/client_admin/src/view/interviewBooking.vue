@@ -27,7 +27,7 @@
     <!-- Interview Grid -->
     <div class="relative">
       <div
-        v-if="interviews?.length > 0"
+        v-if="totalItems > 0"
         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
       >
         <div
@@ -48,15 +48,15 @@
               :class="{
                 'bg-yellow-100 text-yellow-800': interview.status === 'pending',
                 'bg-teal-100 text-teal-800':
-                  interview.status === 'Enterprise Verified',
+                  interview.status === 'enterprise_verified',
                 'bg-red-100 text-red-800':
-                  interview.status === 'Student Verified',
+                  interview.status === 'student_verified',
                 'bg-blue-100 text-blue-800':
-                  interview.status === 'Waiting for Interview Day',
+                  interview.status === 'waiting_for_interview_day',
                 'bg-purple-100 text-purple-800':
-                  interview.status === 'Interviewing',
+                  interview.status === 'interviewing',
                 'bg-lime-100 text-lime-200':
-                  interview.status === 'Waiting for Result',
+                  interview.status === 'waiting_for_result',
                 'bg-green-100 text-green-300': interview.status == 'done',
                 'bg-sky-100 text-sky-300': interview.status == 'cancelled',
               }"
@@ -154,10 +154,43 @@ const store = useStore();
 const searchQuery = ref("");
 const pageSize = ref(8);
 const current = ref(1);
-const paginatedData = computed(
-  () => store.state.interview.paginatedInterviewBookings || []
-);
-const totalItems = computed(() => interviews.value.length);
+
+// --- Client-side search + pagination (backend doesn't support _page/_limit for interview-bookings) ---
+const filteredInterviews = computed(() => {
+  const list = Array.isArray(interviews.value) ? interviews.value : [];
+  const q = (searchQuery.value || "").trim().toLowerCase();
+
+  // Sort newest first to keep paging stable
+  const sorted = [...list].sort((a, b) => (b?.id ?? 0) - (a?.id ?? 0));
+  if (!q) return sorted;
+
+  return sorted.filter((it) => {
+    const enterprise = enterprises.value.find((e) => e.id == it.enterpriseId);
+    const job = jobs.value.find((j) => j.id == it.jobId);
+    const user = users.value.find((u) => u.id == it.userId);
+
+    const haystack = [
+      String(it?.id ?? ""),
+      String(it?.status ?? ""),
+      String(it?.date ?? ""),
+      String(it?.time ?? ""),
+      String(enterprise?.title ?? ""),
+      String(job?.title ?? ""),
+      String(user?.fullName ?? ""),
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return haystack.includes(q);
+  });
+});
+
+const totalItems = computed(() => filteredInterviews.value.length);
+const paginatedData = computed(() => {
+  const start = (current.value - 1) * pageSize.value;
+  const end = start + pageSize.value;
+  return filteredInterviews.value.slice(start, end);
+});
 
 console.log(totalItems);
 
@@ -193,17 +226,17 @@ const findUserName = (interview) => {
 };
 const moveToNext = () => {
   store.dispatch("getAllInterviewBooking").then(() => {
-    fetchPaginatedInterviews(current.value);
+    current.value = 1;
   });
 };
 const getStatusText = (status) => {
   const statusTexts = {
     pending: "Pending",
-    "Enterprise Verified": "Enterprise Verified",
-    "Student Verified": "Student Verified",
-    "Waiting for Interview Day": "Waiting for Interview Day",
-    Interviewing: "Interviewing",
-    "Waiting for Result": "Waiting for Result",
+    enterprise_verified: "Enterprise Verified",
+    student_verified: "Student Verified",
+    waiting_for_interview_day: "Waiting for Interview Day",
+    interviewing: "Interviewing",
+    waiting_for_result: "Waiting for Result",
     done: "Done",
     cancelled: "cancelled",
   };
@@ -211,37 +244,24 @@ const getStatusText = (status) => {
 };
 
 const handleSearch = () => {
-  fetchPaginatedInterviews();
-  store.dispatch("searchInterviewBooking", { title: searchQuery.value });
-};
-
-const fetchPaginatedInterviews = async (page = 1) => {
-  try {
-    const payload = {
-      page,
-      limit: pageSize.value,
-    };
-    await store.dispatch("getPaginatedInterviewBookings", payload);
-  } catch (error) {
-    console.error("Failed to fetch paginated interviews:", error);
-  }
+  // Client-side search; keep pagination consistent with the currently loaded dataset
+  current.value = 1;
 };
 
 const cancelInterview = () => {
   store.dispatch("getAllInterviewBooking").then(() => {
-    fetchPaginatedInterviews(current.value);
+    current.value = 1;
   });
 };
 const handlePageChange = (page) => {
   current.value = page;
-  fetchPaginatedInterviews(page);
 };
 onMounted(() => {
   store.dispatch("getAllInterviewBooking"),
     store.dispatch("getUsers"),
     store.dispatch("getEnterprises"),
-    store.dispatch("interview/getAllJobs"),
-    fetchPaginatedInterviews();
+    // `interview` module is not namespaced; action name is `getAllJobs`
+    store.dispatch("getAllJobs");
 });
 
 const viewDetail = (interview) => {

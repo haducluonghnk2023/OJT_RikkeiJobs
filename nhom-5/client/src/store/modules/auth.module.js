@@ -1,7 +1,7 @@
 import { getAllUsers, register, login } from "@/apis/auth/loginApi";
 
 const auth = {
-  namespaced: true, // Thêm namespace để rõ ràng hơn
+  namespaced: true,
   state: {
     users: [],
     currentUser: null,
@@ -28,9 +28,7 @@ const auth = {
   actions: {
     registerUser: async ({ commit, state }, payload) => {
       try {
-        // Server sẽ kiểm tra email và username trùng lặp
         const response = await register(payload);
-        // extractResponseData đã extract data rồi, nên response là UserResponse object trực tiếp
         if (response) {
           commit("SET_CURRENT_USER", response);
         }
@@ -49,11 +47,10 @@ const auth = {
         console.log(error);
       }
     },
-    
+
     loginUser: async ({ commit }, credentials) => {
       try {
         const response = await login(credentials);
-        // extractResponseData đã extract data rồi, nên response là UserResponse object trực tiếp
         if (response) {
           commit("SET_CURRENT_USER", response);
         }

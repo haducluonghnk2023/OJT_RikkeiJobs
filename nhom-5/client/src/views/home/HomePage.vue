@@ -4,7 +4,7 @@
     <Banner />
     <hot-job class="mt-10" />
     <hot-candidate class="mt-10" />
-    <outstandingnumbers />
+    <outstandingnumbers class="mt-20" />
     <Footer />
   </div>
 </template>

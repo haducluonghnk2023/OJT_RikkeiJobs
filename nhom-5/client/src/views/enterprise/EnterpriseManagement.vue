@@ -1,5 +1,6 @@
 <template>
   <div class="relative w-full h-full">
+    <div ref="pageTopRef"></div>
     <!-- Phần background overlay -->
     <div
       class="absolute inset-0 bg-gray-800 bg-opacity-50 z-10"
@@ -113,7 +114,7 @@
 
 <script setup>
 import AddEnterpriseModel from "@/components/AddEnterpriseModel.vue";
-import { computed, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, ref } from "vue";
 import {
   ArrowRightOutlined,
   EditOutlined,
@@ -126,12 +127,14 @@ import { message } from "ant-design-vue";
 const cancel = () => {
   isModalOpen.value = false;
 };
-const userLoginId = ref(JSON.parse(localStorage.getItem("token")));
+const tokenRaw = localStorage.getItem("token");
+const userLoginId = ref(tokenRaw ? JSON.parse(tokenRaw) : null);
 
 const user = computed(() => store.state.user.userLogin || []);
 const router = useRouter();
 const perPage = 2; // Items per page
 const current = ref(1);
+const pageTopRef = ref(null);
 const paginated = computed(() => store.state.enterprise.paginatedEnterprise);
 const isModalOpen = ref(false);
 const store = useStore();
@@ -165,6 +168,7 @@ const enterpriseId = computed(() =>
 );
 const handlePageChange = async (page) => {
   try {
+    if (userLoginId.value == null) return;
     current.value = page;
     const payload = {
       page,
@@ -174,6 +178,8 @@ const handlePageChange = async (page) => {
 
     await store.dispatch("paginatedEnterprise", payload);
     console.log("Pagination updated:", payload);
+    await nextTick();
+    pageTopRef.value?.scrollIntoView({ behavior: "smooth", block: "start" });
   } catch (error) {
     console.error("Error in handlePageChange:", error);
   }
@@ -189,7 +195,9 @@ const redirect = (enterprise) => {
 console.log(paginated, "aaaa");
 
 onMounted(() => {
-  store.dispatch("getUser", userLoginId.value);
+  if (userLoginId.value != null) {
+    store.dispatch("getUser", userLoginId.value);
+  }
 
   store.dispatch("getAllEnterprise");
   handlePageChange(current.value);

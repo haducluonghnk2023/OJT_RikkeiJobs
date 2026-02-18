@@ -13,7 +13,7 @@ const candidate = {
   getters: {
     activeCandidates: (state) => {
       return state.candidates.filter(
-        (candidate) => candidate.status === "active"
+        (candidate) => String(candidate?.status || "").toLowerCase() === "active"
       );
     },
     totalPagesCandidate: (state) => {
@@ -44,9 +44,11 @@ const candidate = {
         );
         // console.log("API response:", { candidates, totalCandidates });
 
-        // Lọc chỉ các ứng viên có role là "user"
+        // Lọc chỉ các ứng viên active + role user
         const filteredCandidates = candidates.filter(
-          (candidate) => candidate.role === "user"
+          (candidate) =>
+            candidate?.role === "user" &&
+            String(candidate?.status || "").toLowerCase() === "active"
         );
         // console.log(filteredCandidates);
 
@@ -75,10 +77,18 @@ const candidate = {
     getAllCandidates: async ({ commit }) => {
       try {
         const candidates = await getAllCandidates();
-        commit("SET_CANDIDATE", candidates);
-        return candidates;
+        const list = Array.isArray(candidates) ? candidates : [];
+        // Ensure only active "user" role candidates are shown in candidate flows
+        const filtered = list.filter(
+          (c) =>
+            c?.role === "user" &&
+            String(c?.status || "").toLowerCase() === "active"
+        );
+        commit("SET_CANDIDATE", filtered);
+        return filtered;
       } catch (error) {
-        console.error("L��i khi lấy danh sách người dùng:", error);
+        console.error("Lỗi khi lấy danh sách ứng viên:", error);
+        throw error;
       }
     },
   },

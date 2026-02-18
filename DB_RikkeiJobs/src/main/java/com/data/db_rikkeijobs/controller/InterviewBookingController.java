@@ -5,6 +5,8 @@ import com.data.db_rikkeijobs.dto.request.UpdateInterviewBookingRequest;
 import com.data.db_rikkeijobs.dto.response.InterviewBookingResponse;
 import com.data.db_rikkeijobs.dto.response.ResponseWrapper;
 import com.data.db_rikkeijobs.entity.InterviewBooking;
+import com.data.db_rikkeijobs.entity.InterviewBookingStatus;
+import com.data.db_rikkeijobs.exception.HttpBadRequest;
 import com.data.db_rikkeijobs.exception.HttpNotFound;
 import com.data.db_rikkeijobs.mapper.InterviewBookingMapper;
 import com.data.db_rikkeijobs.service.InterviewBookingService;
@@ -108,7 +110,14 @@ public class InterviewBookingController {
 
     @GetMapping("/status/{status}")
     public ResponseEntity<?> getInterviewBookingsByStatus(@PathVariable String status) {
-        List<InterviewBookingResponse> interviewBookings = interviewBookingService.findByStatus(status).stream()
+        final InterviewBookingStatus parsedStatus;
+        try {
+            parsedStatus = InterviewBookingStatus.fromJson(status);
+        } catch (IllegalArgumentException ex) {
+            throw new HttpBadRequest(ex.getMessage());
+        }
+
+        List<InterviewBookingResponse> interviewBookings = interviewBookingService.findByStatus(parsedStatus).stream()
                 .map(interviewBookingMapper::toResponse)
                 .collect(Collectors.toList());
         
@@ -159,15 +168,11 @@ public class InterviewBookingController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> patchInterviewBooking(@PathVariable Long id, @RequestBody InterviewBooking interviewBooking) {
+    public ResponseEntity<?> patchInterviewBooking(@PathVariable Long id, @RequestBody UpdateInterviewBookingRequest request) {
         InterviewBooking existingInterviewBooking = interviewBookingService.findById(id)
                 .orElseThrow(() -> new HttpNotFound("Interview booking not found with id: " + id));
         
-        // Update only provided fields
-        if (interviewBooking.getStatus() != null) {
-            existingInterviewBooking.setStatus(interviewBooking.getStatus());
-        }
-        // Add other fields as needed
+        interviewBookingMapper.updateEntityFromRequest(request, existingInterviewBooking);
         
         InterviewBookingResponse updatedInterviewBooking = interviewBookingMapper.toResponse(
                 interviewBookingService.update(id, existingInterviewBooking));

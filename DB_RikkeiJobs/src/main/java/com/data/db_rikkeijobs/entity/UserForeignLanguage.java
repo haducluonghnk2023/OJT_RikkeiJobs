@@ -18,7 +18,9 @@ public class UserForeignLanguage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "user_id", nullable = false)
+    // FK column is derived from `user` relation when persisting.
+    // Keep a read-only copy for querying/serialization.
+    @Column(name = "user_id", insertable = false, updatable = false)
     private Long userId;
     
     @Column(name = "language", nullable = false)
@@ -26,7 +28,7 @@ public class UserForeignLanguage {
     
     // Quan hệ với User
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 }

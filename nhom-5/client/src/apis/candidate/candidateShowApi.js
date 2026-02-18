@@ -9,7 +9,8 @@ import { extractResponseData } from "@/utils/apiHelper";
  */
 export const getAllCandidates = async () => {
   try {
-    const params = buildQueryString({ status: "active" });
+    // User status in DB is typically "active"/"inActive" (sometimes "Active"); backend filters ignore-case.
+    const params = buildQueryString({ status: "active", role: "user" });
     const response = await apiClient.get(`${API_ENDPOINTS.CANDIDATES}?${params}`);
     return extractResponseData(response);
   } catch (error) {
@@ -32,6 +33,7 @@ export const getShowCandidateByPageDE = async (page, limit) => {
       status: "active",
       _sort: "id",
       _order: "DESC",
+      role: "user",
     });
 
     const response = await apiClient.get(`${API_ENDPOINTS.CANDIDATES}?${params}`);

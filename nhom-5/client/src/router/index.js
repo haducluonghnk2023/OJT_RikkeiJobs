@@ -38,6 +38,12 @@ const routes = [
       import(/* webpackChunkName: "listJob" */ "@/views/job/JobList.vue"),
   },
   {
+    path: "/homepage/saveJob",
+    name: "saveJob",
+    component: () =>
+      import(/* webpackChunkName: "saveJob" */ "@/views/job/SaveJob.vue"),
+  },
+  {
     path: "/homepage/listJob/jobDetail/:id",
     component: () =>
       import(/* webpackChunkName: "jobDetail" */ "@/views/job/JobDetail.vue"),
@@ -139,6 +145,15 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    }
+    if (to.hash) {
+      return { el: to.hash, behavior: "smooth", top: 0 };
+    }
+    return { top: 0, left: 0 };
+  },
 });
 
 export default router;

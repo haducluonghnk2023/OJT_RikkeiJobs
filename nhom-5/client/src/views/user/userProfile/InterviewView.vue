@@ -44,9 +44,17 @@
               <div class="flex flex-col">
                 <span>{{ inter.date ? inter.date : "chờ xác nhận" }} </span>
                 <span>{{ inter.time ? inter.time : "chờ xác nhận" }}</span>
-                <a href="/" target="_blank">{{
-                  inter.meetingLink ? inter.meetingLink : "chờ xác nhận"
-                }}</a>
+                <template v-if="getLocation(inter)">
+                  <a
+                    v-if="inter.interviewMode === 'Online' && inter.meetingLink"
+                    :href="inter.meetingLink"
+                    target="_blank"
+                  >
+                    {{ inter.meetingLink }}
+                  </a>
+                  <span v-else>{{ getLocation(inter) }}</span>
+                </template>
+                <span v-else>chờ xác nhận</span>
               </div>
             </div>
             <!--  -->
@@ -60,7 +68,7 @@
           :page-size="pageSize"
           @change="handlePageChange"
           show-less-items
-          class="text-end mr-[100px]"
+          class="text-end"
         /> -->
       </div>
     </div>
@@ -99,6 +107,16 @@ const getAvatar = (enterpriseId) => {
   // console.log(jobId);
   // console.log(job);
   return enterprise?.avatar;
+};
+
+const getLocation = (inter) => {
+  if (!inter) return "";
+  if (inter.interviewMode === "Online") {
+    return inter.meetingLink || "";
+  }
+  // In-person: prefer detailed address fields
+  const parts = [inter.address, inter.district, inter.province].filter(Boolean);
+  return parts.join(", ");
 };
 
 onMounted(async () => {

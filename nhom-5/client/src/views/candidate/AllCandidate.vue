@@ -215,7 +215,7 @@ const calculateAge = (birthdate) => {
 };
 const activeCandidates = computed(() =>
   store.state.candidate.candidates.filter(
-    (user) => user.status === "active" && user.role === "user"
+    (user) => String(user?.status || "").toLowerCase() === "active" && user.role === "user"
   )
 );
 console.log(activeCandidates);
@@ -256,7 +256,7 @@ const nextPage = () => {
 };
 
 const handleClick = (id) => {
-  if (!currentUser || currentUser.value.status !== "active") {
+  if (!currentUser || String(currentUser.value?.status || "").toLowerCase() !== "active") {
     return;
   }
   router.push(`/homepage/candidate/candidateDetail/${id}`);

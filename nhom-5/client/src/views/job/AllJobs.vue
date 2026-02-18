@@ -1,25 +1,24 @@
 <template>
-  <div>
-    <div class="w-[1200px] flex gap-[24px] ml-[120px] h-[48px] mx-auto">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
       <div
-        class="flex gap-[8px] w-[549px] h-[48px] items-center border-2 rounded-md border-[rgba(221,221,221,1)] bg-[rgba(255,255,255,1)] px-[16px] py-[12px]"
+        class="flex gap-2 flex-1 min-w-0 min-h-[48px] items-center border-2 rounded-md border-[rgba(221,221,221,1)] bg-[rgba(255,255,255,1)] px-3 sm:px-4 py-2 sm:py-3"
       >
-        <div>
-          <font-awesome-icon
-            :icon="['fas', 'magnifying-glass']"
-            class="text-[rgba(188,34,40,1)]"
-          />
-        </div>
+        <font-awesome-icon
+          :icon="['fas', 'magnifying-glass']"
+          class="text-[rgba(188,34,40,1)] shrink-0"
+        />
         <input
-          class="text-[rgba(103,103,103,1)] w-[480px] border-2 border-[rgba(103,103,103,1)] outline-none"
+          class="text-[rgba(103,103,103,1)] flex-1 min-w-0 border-none outline-none bg-transparent"
           placeholder="Vị trí ứng tuyển"
           v-model="pQ"
         />
       </div>
       <div
-        class="flex w-[227px] gap-[24px] h-[48px] px-[16px] py-[12px] border-[rgba(221,221,221,1)] border-2 bg-[rgba(255,255,255,1)] rounded-md"
+        @click="toggleDropdownId"
+        class="flex sm:w-[200px] lg:w-[227px] gap-2 h-[48px] px-3 sm:px-4 py-2 sm:py-3 border-[rgba(221,221,221,1)] border-2 bg-[rgba(255,255,255,1)] rounded-md min-w-0 cursor-pointer relative"
       >
-        <div class="text-[rgba(103,103,103,1)] w-[155px] h-[24px] gap-[8px]">
+        <div class="text-[rgba(103,103,103,1)] min-w-0 flex-1 flex items-center gap-2 truncate">
           <font-awesome-icon
             :icon="['fas', 'briefcase']"
             class="text-[rgba(188,34,40,1)]"
@@ -39,7 +38,7 @@
         </div>
         <ul
           v-if="showDropdownId"
-          class="absolute top-[520px] items-center bg-white text-black w-[13%] shadow-lg rounded-lg z-10 overflow-y-auto max-h-[120px]"
+          class="absolute top-full left-0 mt-1 min-w-[180px] sm:min-w-[200px] bg-white text-black shadow-lg rounded-lg z-20 overflow-y-auto max-h-[200px]"
         >
           <li
             v-for="(item, index) in industries"
@@ -55,11 +54,10 @@
         </ul>
       </div>
       <div
-        class="flex w-[204px] gap-[24px] h-[48px] px-[16px] py-[12px] border-[rgba(221,221,221,1)] border-2 bg-[rgba(255,255,255,1)] rounded-md"
+        @click="toggleDropdown"
+        class="flex sm:w-[180px] lg:w-[204px] gap-2 h-[48px] px-3 sm:px-4 py-2 sm:py-3 border-[rgba(221,221,221,1)] border-2 bg-[rgba(255,255,255,1)] rounded-md min-w-0 cursor-pointer relative"
       >
-        <div
-          class="text-[rgba(103,103,103,1)] w-[132px] h-[24px] gap-[8px] truncate"
-        >
+        <div class="text-[rgba(103,103,103,1)] min-w-0 flex-1 flex items-center gap-2 truncate">
           <font-awesome-icon
             :icon="['fas', 'location-dot']"
             class="text-[rgba(188,34,40,1)]"
@@ -80,7 +78,7 @@
         </div>
         <ul
           v-if="showDropdown"
-          class="absolute top-[520px] items-center bg-white text-black w-[13%] shadow-lg rounded-lg z-10 overflow-y-auto max-h-[120px]"
+          class="absolute top-full left-0 mt-1 min-w-[180px] sm:min-w-[200px] bg-white text-black shadow-lg rounded-lg z-20 overflow-y-auto max-h-[200px]"
         >
           <li
             v-for="(item, index) in province"
@@ -95,18 +93,19 @@
           </li>
         </ul>
       </div>
-      <div
-        class="w-[140px] h-[48px] flex justify-center border-[rgba(221,221,221,1)] border-2 rounded-md bg-[rgba(171,31,36,1)] text-[rgba(255,255,255,1)]"
+      <button
+        @click="applyFiltersNow"
+        class="w-full sm:w-[140px] h-[48px] flex justify-center items-center border-2 border-[rgba(171,31,36,1)] rounded-md bg-[rgba(171,31,36,1)] text-white font-medium"
       >
-        <button @click="searchJobs">Tìm kiếm</button>
-      </div>
+        Tìm kiếm
+      </button>
     </div>
     <!-- ------------------------------- -->
-    <div class="flex w-[1200px] h-[56px] justify-between mx-auto mt-[38px]">
-      <div class="text-[rgba(0,0,0,1)] text-[24px] font-bold">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-6 sm:mt-8">
+      <div class="text-[rgba(0,0,0,1)] text-xl sm:text-2xl font-bold">
         Tất cả việc làm
       </div>
-      <div class="flex w-[271px] h-[24px] gap-[16px]">
+      <div class="flex items-center gap-3 sm:gap-4">
         <div class="flex w-[179px] h-[20px] gap-[8px]">
           <p>Sắp xếp theo:</p>
           <p>Mới nhất</p>
@@ -141,279 +140,175 @@
       </div>
     </div>
 
-    <hr class="my-[10px] mx-[162px] mb-[28px]" />
+    <hr class="my-4 sm:my-6 border-gray-200" />
     <!-- ---------------------------s------- -->
+    <!-- Grid view: giống trang home -->
     <div
-      :class="{
-        'grid grid-cols-1': isSorted,
-        'grid grid-cols-3 w-[1220px] mx-auto': !isSorted,
-      }"
+      v-if="!isSorted"
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
     >
       <div
-        v-for="(job, index) in jobsWithDaysLeft"
+        v-for="(job, index) in paginatedJobsWithDaysLeft"
         :key="index"
-        :class="[
-          'mx-auto mb-4 flex justify-between p-[20px] rounded-md border-2',
-          { 'border-[rgba(221,221,221,1)]': index === 0 },
-          isSorted
-            ? 'w-[1200px] h-[160px]'
-            : 'w-[384px] flex  h-[186px] relative top-0 right-0 ',
-        ]"
+        class="w-full min-w-0"
       >
-        <!-- left -->
-        <!-- list -->
-        <div
-          :class="{
-            'flex w-[690px] h-[120px] gap-[20px]': isSorted,
-            'flex w-[385px] h-[186px] gap-[20px]': !isSorted,
-          }"
-        >
-          <div
-            :class="{
-              'w-[120px] h-[80px]': isSorted,
-              'w-[80px] h-[80px]': !isSorted,
-            }"
-          >
+        <div class="bg-white w-full rounded-lg shadow-md border border-gray-200 p-4 sm:p-5 hover:shadow-lg transition-shadow relative overflow-hidden h-full flex flex-col">
+          <div class="flex gap-5">
             <img
               :src="job.image"
               alt=""
-              :class="{
-                'w-[80px] h-[80px] rounded-md text-[rgba(221,221,221,1)]':
-                  !isSorted,
-                'w-[120px] h-[120px] rounded-md text-[rgba(221,221,221,1)]':
-                  isSorted,
-              }"
+              class="rounded-md object-cover w-20 h-20 shrink-0"
             />
-          </div>
-          <div class="h-[118px] w-[256px]">
-            <div class="flex flex-col gap-[8px] w-[256px]">
+            <div class="justify-between items-start gap-4 mb-3 min-w-0 flex-1 overflow-hidden">
               <p
-                :class="{
-                  'text-[18px] text-[rgba(17,17,17,1)] w-[450px] hover:cursor-pointer font-bold h-[28px] m-0':
-                    isSorted,
-                  'text-[16px] text-[rgba(17,17,17,1)] w-[256px] hover:cursor-pointer font-bold h-[48px] m-0 line-clamp-1':
-                    !isSorted,
-                }"
                 @click="handleClickA(job.id)"
+                class="!text-[16px] font-semibold text-red-700 leading-tight hover:cursor-pointer"
               >
-                {{ job.title }}
+                <span class="line-clamp-2">{{ job.title }}</span>
               </p>
-              <div class="flex">
-                <!-- Hiển thị tối đa 3 hoặc toàn bộ dựa trên trạng thái isExpanded -->
+              <div class="flex flex-wrap gap-2">
                 <p
-                  v-for="(edu, eduIndex) in isExpanded
-                    ? job.rank
-                    : job.rank?.slice(0, 3)"
+                  v-for="(edu, eduIndex) in job.rank?.slice(0, 3)"
                   :key="eduIndex"
                   :class="[
-                    'w-[62px] h-[26px] rounded-xl flex justify-center items-center text-[14px] font-semibold',
+                    'px-3 h-[26px] rounded-xl flex justify-center items-center text-[14px] font-semibold',
                     {
-                      'bg-[rgba(236,253,243,1)] text-[rgba(2,122,72,1)]':
-                        edu === 'Fresher',
-                      'bg-[rgba(238,244,255,1)] text-[rgba(53,56,205,1)]':
-                        edu === 'Junior',
-                      'bg-[rgba(255,246,237,1)] text-[rgba(196,50,10,1)]':
-                        edu === 'Middle',
-                      'bg-[rgba(245,246,255,1)] text-[#8c70a7]':
-                        edu === 'Senior',
+                      'bg-[rgba(236,253,243,1)] text-[rgba(2,122,72,1)]': edu === 'Fresher',
+                      'bg-[rgba(238,244,255,1)] text-[rgba(53,56,205,1)]': edu === 'Junior',
+                      'bg-[rgba(255,246,237,1)] text-[rgba(196,50,10,1)]': edu === 'Middle',
+                      'bg-[rgba(245,246,255,1)] text-[#8c70a7]': edu === 'Senior',
                       'bg-[#f1f2f5] text-[#573775]': edu === 'Lead',
                     },
                   ]"
                 >
                   {{ edu }}
                 </p>
-                <!-- Nút hiển thị/ẩn thêm -->
-                <div
-                  v-if="job.rank?.length > 3"
-                  @click="toggleExpanded"
-                  class="cursor-pointer w-[27px] h-[26px] rounded-full bg-[rgba(221,221,221,1)] flex justify-center items-center text-[rgba(103,103,103,1)]"
-                >
-                  {{ isExpanded ? "-" : "+" + (job.rank?.length - 3) }}
-                </div>
-              </div>
-            </div>
-            <div
-              :class="{
-                'flex  flex-col gap-[8px] relative right-[100px]': !isSorted,
-                'flex flex-col gap-[8px]': isSorted,
-              }"
-            >
-              <div>
-                <div
-                  v-if="isSorted"
-                  class="flex items-center w-[315px] h-[18px] gap-[12px]"
-                >
-                  <div class="flex gap-[8px]">
-                    <div class="flex items-center justify-center">
-                      <font-awesome-icon
-                        :icon="['fas', 'clock']"
-                        class="text-[rgba(188,34,40,1)]"
-                      />
-                    </div>
-                    <p
-                      class="text-[12px] text-[rgba(61,61,61,1)] mt-3.5 w-[126px] h-[18px]"
-                    >
-                      Cập nhật {{ job.timeAgo }}
-                    </p>
-                  </div>
-                  <div class="flex gap-[8px]">
-                    <span
-                      class="w-[16px] mt-3.5 h-[16px] bg-[rgba(240,240,240,1)] flex items-center justify-center rounded-full"
-                    >
-                      <template v-if="vietnamProvinces.includes(job.province)">
-                        <div
-                          class="w-[16px] h-[16px] bg-[rgba(216,0,39,1)] rounded-full flex items-center justify-center"
-                        >
-                          <img
-                            class="w-[7.31px] h-[6.96px]"
-                            src="../../assets/img/vn.svg"
-                            alt=""
-                          />
-                        </div>
-                      </template>
-                    </span>
-
-                    <p
-                      class="text-[12px] text-[rgba(61,61,61,1)] mt-3.5 w-[121px] h-[18px]"
-                    >
-                      {{ job.province.replace(/^Thành phố\s*|^Tỉnh\s*/, "") }}
-                    </p>
-                  </div>
-                  <div class="flex gap-[8px]">
-                    <div class="flex items-center justify-center">
-                      <font-awesome-icon
-                        :icon="['fas', 'briefcase']"
-                        class="text-[rgba(188,34,40,1)]"
-                      />
-                    </div>
-                    <p
-                      class="text-[12px] text-[rgba(61,61,61,1)] mt-3.5 w-[94px] h-[18px]"
-                    >
-                      {{ job.workingTime }}
-                    </p>
-                  </div>
-                </div>
-                <div v-else>
-                  <div
-                    :class="{
-                      'flex items-center w-[315px]  h-[18px] gap-[12px] relative left-0':
-                        isSorted,
-                      'flex items-center w-[292px]  h-[18px] gap-[12px] relative right-0':
-                        !isSorted,
-                    }"
-                  >
-                    <div
-                      class="flex gap-[8px] items-center w-auto h-[18px] font-semibold"
-                    >
-                      <i class="fas fa-money-bill">
-                        <font-awesome-icon
-                          :icon="['fas', 'money-bill']"
-                          class="text-[rgba(188,34,40,1)]"
-                        />
-                      </i>
-                      <span class="text-[12px] h-[18px] font-[400] truncate">
-                        {{ job.salary }} {{ job.salaryCurrent }}
-                      </span>
-                    </div>
-                    <div class="flex gap-[8px]">
-                      <span
-                        class="w-[16px] mt-3.5 h-[16px] bg-[rgba(240,240,240,1)] flex items-center justify-center rounded-full"
-                      >
-                        <template
-                          v-if="vietnamProvinces.includes(job.province)"
-                        >
-                          <div
-                            class="w-[16px] h-[16px] bg-[rgba(216,0,39,1)] rounded-full flex items-center justify-center"
-                          >
-                            <img
-                              class="w-[7.31px] h-[6.96px]"
-                              src="../../assets/img/vn.svg"
-                              alt=""
-                            />
-                          </div>
-                        </template>
-                      </span>
-
-                      <p
-                        class="text-[12px] text-[rgba(61,61,61,1)] mt-3.5 w-[75px] h-[18px] truncate"
-                      >
-                        {{ job.province.replace(/^Thành phố\s*|^Tỉnh\s*/, "") }}
-                      </p>
-                    </div>
-                    <div class="flex gap-[8px]">
-                      <div class="flex items-center justify-center">
-                        <font-awesome-icon
-                          :icon="['fas', 'briefcase']"
-                          class="text-[rgba(188,34,40,1)]"
-                        />
-                      </div>
-                      <p
-                        class="text-[12px] text-[rgba(61,61,61,1)] mt-3.5 w-[94px] h-[18px]"
-                      >
-                        {{ job.workingTime }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div
-                class="text-[rgba(132,132,132,1)] flex text-[12px] w-[266px]"
-              >
-                <p v-if="!isSorted">Cập nhật {{ job.timeAgo }} -&nbsp;</p>
-                Còn
-                <p class="font-bold ml-1 mr-1">{{ job.daysLeft }}</p>
-                ngày để ứng tuyển
-              </div>
-            </div>
-            <div
-              v-if="!isSorted"
-              class="w-[40px] h-[40px] relative bottom-12 left-52 flex justify-center items-center rounded-md right-4 text-gray-400 hover:text-gray-600 heart border-2 border-[rgba(221,221,221,1)]"
-            >
-              <div class="bg-[rgba(255,255,255,1)]">
-                <font-awesome-icon
-                  :icon="['fas', 'heart']"
-                  class="heart-item"
-                />
               </div>
             </div>
           </div>
-        </div>
-        <!-- right -->
-        <div class="w-[172px] h-[20px] gap-[56px] flex flex-col">
-          <div
-            v-if="isSorted"
-            class="justify-end flex text-[rgba(188,34,40,1)] text-[16px] font-bold"
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 m-0 p-0 text-[12px] mb-4 min-w-0">
+            <div class="flex gap-[8px] items-center">
+              <font-awesome-icon :icon="['fas', 'money-bill']" class="text-[rgba(188,34,40,1)]" />
+              <span class="truncate max-w-[140px]">{{ formatSalary(job.salary) }}</span>
+            </div>
+            <div class="flex items-center truncate gap-1 max-w-[120px]">
+              <span class="w-4 h-4 shrink-0 flex items-center justify-center rounded-full overflow-hidden">
+                <img v-if="vietnamProvinces.includes(job.province)" class="w-2 h-2" :src="vnSvg" alt="" />
+              </span>
+              <span class="truncate">{{ job.province?.replace(/^Thành phố\s*|^Tỉnh\s*/, "") }}</span>
+            </div>
+            <div class="flex items-center">
+              <font-awesome-icon :icon="['fas', 'briefcase']" class="text-[rgba(188,34,40,1)] mr-1 shrink-0" />
+              <span class="truncate max-w-[100px]">{{ job.workingTime }}</span>
+            </div>
+          </div>
+          <p class="text-gray-500 text-[12px] leading-tight mt-auto">
+            Cập nhật {{ job.timeAgo }} - Còn
+            <span class="font-semibold text-black">{{ job.daysLeft }}</span>
+            ngày để ứng tuyển
+          </p>
+          <button
+            type="button"
+            @click.stop="toggleFavorite(job.id)"
+            class="absolute w-[32px] top-4 h-[32px] right-4 flex justify-center items-center rounded border transition-colors"
+            :class="{
+              'text-red-500 bg-red-50 border-red-200': isFavorite(job.id),
+              'text-gray-400 hover:text-gray-600 border-[rgba(221,221,221,1)]': !isFavorite(job.id),
+            }"
           >
-            {{ job.salary }} {{ job.salaryCurrent }}
-          </div>
-          <div class="flex gap-[12px]">
-            <div
-              v-if="isSorted"
-              @click="handleClick(job.id)"
-              class="w-[120px] h-[40px] hover:cursor-pointer bg-[rgba(171,31,36,1)] text-[rgba(255,255,255,1)] rounded-md flex items-center justify-center"
-            >
-              Ứng tuyển
-            </div>
-            <div
-              v-if="isSorted"
-              class="w-[40px] h-[40px] flex justify-center items-center rounded-md right-4 text-gray-400 hover:text-gray-600 heart border-2 border-[rgba(221,221,221,1)]"
-            >
-              <div class="bg-[rgba(255,255,255,1)]">
-                <font-awesome-icon
-                  :icon="['fas', 'heart']"
-                  class="heart-item"
-                />
-              </div>
-            </div>
-          </div>
+            <font-awesome-icon :icon="['fas', 'heart']" :class="isFavorite(job.id) ? 'text-red-500' : 'text-[rgba(221,221,221,1)]'" />
+          </button>
         </div>
       </div>
-      <div>
-        <!-- Grid H -->
+    </div>
+    <!-- List view -->
+    <div v-else class="space-y-4">
+      <div
+        v-for="(job, index) in paginatedJobsWithDaysLeft"
+        :key="index"
+        class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 sm:p-5 rounded-lg border-2 border-gray-200 min-w-0"
+      >
+        <div class="flex flex-1 min-w-0 gap-4">
+          <img
+            :src="job.image"
+            alt=""
+            class="w-20 h-20 sm:w-[100px] sm:h-[100px] rounded-md object-cover shrink-0"
+          />
+          <div class="min-w-0 flex-1">
+            <p
+              @click="handleClickA(job.id)"
+              class="text-base sm:text-lg text-[rgba(17,17,17,1)] hover:cursor-pointer font-bold line-clamp-2"
+            >
+              {{ job.title }}
+            </p>
+            <div class="flex flex-wrap gap-2 mt-2">
+              <span
+                v-for="(edu, eduIndex) in isExpanded ? job.rank : job.rank?.slice(0, 3)"
+                :key="eduIndex"
+                :class="[
+                  'px-3 h-6 rounded-xl flex items-center text-sm font-semibold shrink-0',
+                  {
+                    'bg-[rgba(236,253,243,1)] text-[rgba(2,122,72,1)]': edu === 'Fresher',
+                    'bg-[rgba(238,244,255,1)] text-[rgba(53,56,205,1)]': edu === 'Junior',
+                    'bg-[rgba(255,246,237,1)] text-[rgba(196,50,10,1)]': edu === 'Middle',
+                    'bg-[rgba(245,246,255,1)] text-[#8c70a7]': edu === 'Senior',
+                    'bg-[#f1f2f5] text-[#573775]': edu === 'Lead',
+                  },
+                ]"
+              >
+                {{ edu }}
+              </span>
+              <button
+                v-if="job.rank?.length > 3"
+                @click="toggleExpanded"
+                class="w-7 h-6 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-sm"
+              >
+                {{ isExpanded ? "-" : "+" + (job.rank?.length - 3) }}
+              </button>
+            </div>
+            <div class="flex flex-wrap items-center gap-3 mt-2 text-[12px] text-gray-600">
+              <span class="flex items-center gap-1">
+                <font-awesome-icon :icon="['fas', 'clock']" class="text-[rgba(188,34,40,1)]" />
+                Cập nhật {{ job.timeAgo }}
+              </span>
+              <span class="flex items-center gap-1 truncate max-w-[150px]">
+                <img v-if="vietnamProvinces.includes(job.province)" class="w-4 h-4" :src="vnSvg" alt="" />
+                {{ job.province?.replace(/^Thành phố\s*|^Tỉnh\s*/, "") }}
+              </span>
+              <span class="flex items-center gap-1">
+                <font-awesome-icon :icon="['fas', 'briefcase']" class="text-[rgba(188,34,40,1)]" />
+                {{ job.workingTime }}
+              </span>
+            </div>
+            <p class="text-[12px] text-gray-500 mt-1">
+              Còn <strong>{{ job.daysLeft }}</strong> ngày để ứng tuyển
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 shrink-0">
+          <span class="text-[rgba(188,34,40,1)] text-base font-bold">{{ formatSalary(job.salary) }}</span>
+          <button
+            @click="handleClick(job.id)"
+            class="px-4 h-10 bg-[rgba(171,31,36,1)] text-white rounded-md text-sm font-medium"
+          >
+            Ứng tuyển
+          </button>
+          <button
+            type="button"
+            @click.stop="toggleFavorite(job.id)"
+            class="w-10 h-10 flex justify-center items-center rounded-md border-2 transition-colors shrink-0"
+            :class="{
+              'text-red-500 bg-red-50 border-red-300': isFavorite(job.id),
+              'text-gray-400 hover:text-gray-600 border-gray-300': !isFavorite(job.id),
+            }"
+          >
+            <font-awesome-icon :icon="['fas', 'heart']" :class="isFavorite(job.id) ? 'text-red-500' : ''" />
+          </button>
+        </div>
       </div>
     </div>
 
-    <div class="flex items-center md:justify-end space-x-2 md:mr-[130px] mt-5">
+    <div class="flex flex-wrap items-center justify-center sm:justify-end gap-2 mt-6 pb-8">
       <button
         @click="changePage(currentPage - 1)"
         v-if="currentPage > 1"
@@ -447,9 +342,11 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
+import { formatSalary } from "@/utils/formatters";
+import vnSvg from "@/assets/img/vn.svg";
 
 const store = useStore();
 const router = useRouter();
@@ -476,6 +373,45 @@ const isExpanded = ref(false);
 const jobItems = ref([]);
 const toggleExpanded = () => {
   isExpanded.value = !isExpanded.value;
+};
+
+// ----- Auto filter (modern UX): change is applied immediately (debounced) -----
+let filterTimer = null;
+const buildQuery = () => ({
+  position: (pQ.value || "").trim(),
+  industry: (selectedIndustries.value || "").trim(),
+  province: (selectedProvince.value || "").trim(),
+});
+
+const syncQueryToUrl = (query) => {
+  const q = {};
+  if (query.position) q.position = query.position;
+  if (query.industry) q.industry = query.industry;
+  if (query.province) q.province = query.province;
+  router.replace({ name: route.name, query: q });
+};
+
+const applyFilters = async () => {
+  const query = buildQuery();
+  // Always start from page 1 when filters change
+  store.commit("SET_PAGE", 1);
+  await store.dispatch("searchJobs", query);
+  syncQueryToUrl(query);
+  nextTick(() => {
+    jobItems.value[0]?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+};
+
+const applyFiltersDebounced = () => {
+  if (filterTimer) clearTimeout(filterTimer);
+  filterTimer = setTimeout(() => {
+    applyFilters();
+  }, 350);
+};
+
+const applyFiltersNow = () => {
+  if (filterTimer) clearTimeout(filterTimer);
+  applyFilters();
 };
 const changeDisplay = () => {
   isSorted.value = true;
@@ -572,63 +508,51 @@ const handleClick = (id) => {
   router.push(`/homepage/listJob/jobDetail/${id}`);
 };
 
-const searchJobs = () => {
-  const query = {
-    position: pQ.value,
-    industry: selectedIndustries.value,
-    province: selectedProvince.value,
-  };
-
-  store.dispatch("searchJobs", query).then(() => {
-    const totalCount = store.state.jobs.totalJobs;
-    const perPage = store.state.jobs.limit;
-    const totalPages = Math.ceil(totalCount / perPage);
-    store.commit("SET_TOTAL_PAGES", totalPages);
-  });
-};
+watch([pQ, selectedIndustries, selectedProvince], () => {
+  applyFiltersDebounced();
+});
 
 const handleClickA = async (jobId) => {
   router.push(`/homepage/listJob/jobDetail/${jobId}`);
+};
+
+const isFavorite = (jobId) => store.getters["favorites/isFavorite"]?.(jobId) ?? false;
+const toggleFavorite = (jobId) => {
+  store.dispatch("favorites/toggleFavorite", jobId);
 };
 
 const refesh = () => {
   pQ.value = "";
   selectedIndustries.value = "";
   selectedProvince.value = "";
-
-  store.dispatch("getJobsByPage", 1).then(() => {
-    jobItems.value = jobs.value;
-  });
+  applyFiltersNow();
 };
 
 const changePage = (page) => {
   if (page === "...") return;
-
-  store.dispatch("getJobsByPage", page).then(() => {
-    jobItems.value = jobsWithDaysLeft.value;
-    nextTick(() => {
-      jobItems.value[0]?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+  store.commit("SET_PAGE", page);
+  nextTick(() => {
+    jobItems.value[0]?.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 };
 
-onMounted(() => {
-  store.dispatch("getJobsByPage", 1);
-  store.dispatch("filteredIndustry");
-  store.dispatch("getAllProvince").then(() => {
-    province.value = store.state.provinces.provinces;
-  });
-  jobItems.value = jobsWithDaysLeft.value;
+const pageSize = computed(() => store.state.jobs.limit || 9);
+const paginatedJobsWithDaysLeft = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value;
+  const end = start + pageSize.value;
+  return jobsWithDaysLeft.value.slice(start, end);
 });
 
-onMounted(() => {
-  store.dispatch("getJobsByPage", 1);
+onMounted(async () => {
+  // Load full list once so filtering is correct across all jobs
+  await store.dispatch("getAllJobs");
   store.dispatch("filteredIndustry");
-});
-onMounted(() => {
-  store.dispatch("getAllProvince").then(() => {
-    province.value = store.state.provinces.provinces;
-  });
+  store.dispatch("getAllProvince");
+  jobItems.value = jobsWithDaysLeft.value;
+  // Apply initial query (if any) without requiring a button click
+  if (pQ.value || selectedIndustries.value || selectedProvince.value) {
+    applyFiltersNow();
+  }
 });
 </script>
 

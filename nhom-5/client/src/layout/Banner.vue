@@ -1,5 +1,7 @@
 <template>
-  <div class="relative h-[435px] flex items-center justify-center text-white">
+  <div
+    class="relative min-h-[320px] sm:min-h-[380px] lg:min-h-[435px] flex items-center justify-center text-white"
+  >
     <div
       class="absolute inset-0 bg-cover bg-center image-banner"
       style="
@@ -13,37 +15,35 @@
     <div class="absolute inset-0 bg-black opacity-50"></div>
 
     <!-- Nội dung phía trước -->
-    <div class="relative flex flex-col items-center gap-[24px]">
+    <div class="relative flex flex-col items-center gap-6 w-full px-4">
       <!-- Tiêu đề -->
-      <h1
-        class="text-[48px] font-bold m-0 w-[876px] flex items-center justify-center"
-      >
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold m-0 max-w-4xl text-center">
         Tìm kiếm việc làm cùng Rikkei Jobs!
       </h1>
 
       <!-- Khung tìm kiếm -->
-      <div class="flex items-center gap-[24px] p-2 rounded-lg w-full">
+      <div
+        class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-6 p-2 rounded-lg w-full max-w-4xl"
+      >
         <!-- Ô tìm kiếm vị trí -->
-        <div class="gap-[12px] flex">
-          <div
-            class="flex items-center bg-gray-100 p-2 rounded-lg w-[458px] h-[48px]"
-          >
+        <div class="gap-3 flex flex-col sm:flex-row w-full">
+          <div class="flex items-center bg-gray-100 p-2 rounded-lg w-full h-12">
             <SearchOutlined class="text-gray-500 w-5 h-5" />
             <input
               type="text"
               placeholder="Vị trí ứng tuyển"
-              class="bg-gray-100 text-gray-700 outline-none ml-2"
+              class="bg-gray-100 text-gray-700 outline-none ml-2 w-full min-w-0"
               v-model="positionQuery"
             />
           </div>
 
           <!-- Dropdown chọn địa điểm -->
           <div
-            class="relative flex bg-gray-100 p-2 rounded-lg w-[234px] h-[48px] items-center justify-between"
+            class="relative flex bg-gray-100 p-2 rounded-lg w-full sm:w-60 h-12 items-center justify-between"
           >
-            <div class="flex items-center w-[190px] h-[24px]">
+            <div class="flex items-center min-w-0">
               <EnvironmentOutlined class="text-gray-500 w-5 h-5" />
-              <p class="text-gray-700 ml-2 mt-4">
+              <p class="text-gray-700 ml-2 my-0 truncate">
                 {{ selectedProvince || "Tất cả địa điểm" }}
               </p>
             </div>
@@ -51,34 +51,34 @@
               class="text-gray-800 mr-3 cursor-pointer"
               @click="toggleDropdown"
             />
-          </div>
 
-          <!-- Danh sách tỉnh thành -->
-          <ul
-            v-if="showDropdown"
-            class="absolute top-[160px] left-0 bg-white text-black w-full shadow-lg rounded-lg z-10 overflow-y-auto max-h-[120px]"
-          >
-            <input
-              type="text"
-              placeholder="Tìm kiếm "
-              class="w-[70%] ml-3 outline-none"
-              v-model="searchQuery"
-            />
-            <li
-              v-for="(item, index) in filteredProvinces"
-              :key="index"
-              class="p-2 hover:bg-gray-200 cursor-pointer"
-              @click="selectProvince(item.name)"
+            <!-- Danh sách tỉnh thành -->
+            <ul
+              v-if="showDropdown"
+              class="absolute left-0 top-full mt-2 bg-white text-black w-full shadow-lg rounded-lg z-10 overflow-y-auto max-h-60"
             >
-              {{ item.name }}
-            </li>
-          </ul>
+              <input
+                type="text"
+                placeholder="Tìm kiếm "
+                class="w-full px-3 py-2 outline-none border-b"
+                v-model="searchQuery"
+              />
+              <li
+                v-for="(item, index) in filteredProvinces"
+                :key="index"
+                class="p-2 hover:bg-gray-200 cursor-pointer"
+                @click="selectProvince(item.name)"
+              >
+                {{ item.name }}
+              </li>
+            </ul>
+          </div>
         </div>
 
         <!-- Nút tìm kiếm -->
         <button
           @click="searchPosition"
-          class="bg-red-600 text-white px-6 py-2 rounded-lg w-[140px] h-[48px] hover:bg-red-700"
+          class="bg-red-600 text-white px-6 py-2 rounded-lg w-full sm:w-36 h-12 hover:bg-red-700"
         >
           Tìm kiếm
         </button>

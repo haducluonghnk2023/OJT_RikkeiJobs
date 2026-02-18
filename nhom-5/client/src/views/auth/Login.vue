@@ -2,11 +2,11 @@
   <div class="flex min-h-screen w-[100%] h-[680px]">
     <div class="flex flex-col justify-center w-full md:w-1/2 p-12 bg-gray-50">
       <div class="mb-1 absolute top-[-200px] left-[1px] w-[490px] h-[300px]">
-        <img class="w-[550px]" src="../../assets/decor.svg" alt="" />
+        <img class="w-[550px]" :src="decorSvg" alt="" />
       </div>
       <div class="flex relative top-0 mb-8 left-[110px]">
-        <img src="../../assets/rikkei.svg" alt="Rikkei" class="h-8" />
-        <img src="../../assets/jobs.svg" alt="Jobs" class="h-8 ml-1" />
+        <img :src="rikkeiSvg" alt="Rikkei" class="h-8" />
+        <img :src="jobsSvg" alt="Jobs" class="h-8 ml-1" />
       </div>
       <div class="mx-auto w-[451px] h-[445px]">
         <h2 class="text-3xl font-bold w-[158px]">Đăng nhập</h2>
@@ -98,6 +98,9 @@ import { useRouter } from "vue-router";
 import { UserOutlined, LockOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import { extractErrorMessage } from "@/utils/apiHelper";
+import decorSvg from "@/assets/decor.svg";
+import rikkeiSvg from "@/assets/rikkei.svg";
+import jobsSvg from "@/assets/jobs.svg";
 
 const store = useStore();
 const router = useRouter();
@@ -134,14 +137,18 @@ const handleLogin = async () => {
     // extractResponseData đã extract data rồi, nên response là UserResponse object trực tiếp
     if (response) {
       // Chỉ lưu access token, không lưu email và password để bảo mật
-      localStorage.setItem("token", response.id);
+      // Store as JSON so other places can safely JSON.parse()
+      localStorage.setItem("token", JSON.stringify(response.id));
 
       message.success("Đăng nhập thành công!");
 
       // Redirect dựa trên role
       if (response.role === "admin") {
-        // Redirect sang trang admin ở port 5174
-        window.location.href = "http://localhost:5174/admin";
+        // Cross-port redirect: localStorage không share giữa 5173 và 5174,
+        // nên phải truyền token (ở đây là userId) qua query để admin app nhận và lưu.
+        const adminUrl = new URL("http://localhost:5174/admin");
+        adminUrl.searchParams.set("token", String(response.id));
+        window.location.href = adminUrl.toString();
       } else {
         router.push("/");
       }

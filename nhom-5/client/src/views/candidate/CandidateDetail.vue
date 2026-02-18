@@ -154,14 +154,18 @@ const cancel = () => {
 const store = useStore();
 const route = useRoute();
 const userId = route.params.id;
-const users = computed(() => store.state.login.users);
+const users = computed(() => store.state.auth?.users || []);
 const isOpen = ref(false);
 const loggedUser = computed(() => {
-  const users = store.state.login.users;
-  const loggedUserId = JSON.parse(localStorage.getItem("token"));
-  return users.find((u) => u.id == loggedUserId);
+  const tokenRaw = localStorage.getItem("token");
+  const loggedUserId = tokenRaw ? JSON.parse(tokenRaw) : null;
+  const fromUserModule = store.state.user?.userLogin || null;
+  if (fromUserModule?.id != null) return fromUserModule;
+  const list = store.state.auth?.users || [];
+  if (loggedUserId == null) return null;
+  return list.find((u) => u.id == loggedUserId) || null;
 });
-console.log(loggedUser);
+// console.log(loggedUser.value);
 
 const isAllowedToViewCV = computed(() => {
   return (
@@ -216,7 +220,7 @@ const filteredCvs = computed(() => {
 
 onMounted(async () => {
   await store.dispatch("getDetailCandidate", userId);
-  await store.dispatch("getAllUsers");
+  await store.dispatch("auth/getAllUsers");
   await store.dispatch("getCvCdd");
 });
 const candidate = computed(() => {

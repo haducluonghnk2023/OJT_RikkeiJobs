@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.data.db_rikkeijobs.entity.InterviewBookingStatus;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class CreateInterviewBookingRequest {
     @NotNull(message = "User ID is required")
     private Long userId;
 
-    private String status;
+    private InterviewBookingStatus status;
     private String meetingLink;
     private List<String> updateStatusTime;
     private String cancelReason;

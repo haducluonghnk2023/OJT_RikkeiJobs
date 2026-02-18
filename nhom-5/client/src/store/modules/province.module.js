@@ -7,13 +7,18 @@ const provinces = {
   getters: {},
   mutations: {
     setProvince(state, provinces) {
-      state.provinces = provinces;
+      state.provinces = Array.isArray(provinces) ? provinces : [];
     },
   },
   actions: {
     getAllProvince: async ({ commit }) => {
-      const data = await province();
-      commit("setProvince", data);
+      try {
+        const data = await province();
+        commit("setProvince", data);
+      } catch (e) {
+        // Don't break the home page if provinces API fails
+        commit("setProvince", []);
+      }
     },
   },
 };

@@ -8,6 +8,8 @@ import {
 
 const jobs = {
   state: {
+    // Full list used as the source of truth for filtering
+    allJobs: [],
     jobs: [],
     totalJobs: 0,
     currentPage: 1,
@@ -21,11 +23,17 @@ const jobs = {
       return Math.ceil(state.totalJobs / state.limit);
     },
     activeJobs: (state) => {
-      return state.jobs.filter((job) => job.status == true);
+      // Public client should only show verified jobs
+      return state.jobs.filter(
+        (job) => String(job?.flight || "").toLowerCase() === "verified"
+      );
     },
     Job: (state) => state.jobs,
   },
   mutations: {
+    SET_ALL_JOBS: (state, jobs) => {
+      state.allJobs = Array.isArray(jobs) ? jobs : [];
+    },
     SET_JOBS: (state, jobs) => {
       state.jobs = jobs;
     },
@@ -62,7 +70,11 @@ const jobs = {
     getAllJobs: async ({ commit }) => {
       try {
         const jobs = await getAllJobs();
+        // Keep legacy mutation + also set totalJobs so UI pagination/filtering can work client-side
+        commit("SET_ALL_JOBS", jobs);
         commit("SET_JOBS", jobs);
+        commit("SET_JOB", { jobs, totalJobs: Array.isArray(jobs) ? jobs.length : 0 });
+        commit("SET_PAGE", 1);
       } catch (error) {
         console.error("Lỗi khi lấy danh sách công việc:", error);
       }
@@ -112,13 +124,19 @@ const jobs = {
     },
     searchJobs: async ({ commit, state }, query) => {
       try {
+        const sourceJobs =
+          Array.isArray(state.allJobs) && state.allJobs.length > 0
+            ? state.allJobs
+            : state.jobs;
+
         // Nếu không có bất kỳ trường nào trong query, trả về toàn bộ công việc
         if (!query.industry && !query.position && !query.province) {
-          commit("SET_FILTERED_JOB", state.jobs);
+          commit("SET_FILTERED_JOB", sourceJobs);
+          commit("SET_JOB", { jobs: sourceJobs, totalJobs: sourceJobs.length });
           return;
         }
         // Lọc công việc theo các tiêu chí trong query
-        const filteredJobs = state.jobs.filter((job) => {
+        const filteredJobs = sourceJobs.filter((job) => {
           const matchesIndustry = query.industry
             ? job.industry?.toLowerCase().includes(query.industry.toLowerCase())
             : true; // Nếu không có ngành nghề, bỏ qua điều kiện

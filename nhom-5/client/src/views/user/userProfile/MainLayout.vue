@@ -1,12 +1,14 @@
 <template>
   <div>
     <Header></Header>
-    <div class="flex">
-      <Sidebar />
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex">
+        <Sidebar />
 
-      <router-view
-        class="bg-[#fafafa] sm:min-h-[720px] w-full px-[10px] py-[10px]"
-      ></router-view>
+        <router-view
+          class="bg-[#fafafa] sm:min-h-[720px] w-full flex-1 min-w-0 px-4 sm:px-6 py-6"
+        ></router-view>
+      </div>
     </div>
     <Footer></Footer>
   </div>

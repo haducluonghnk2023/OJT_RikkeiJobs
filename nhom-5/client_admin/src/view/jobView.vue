@@ -3,7 +3,7 @@
     <context-holder />
 
     <div class="flex justify-between px-5">
-      <h1 class="font-bold text-3xl">Jobs</h1>
+      <h1 class="font-bold text-3xl">Quản lý công việc</h1>
     </div>
 
     <a-divider class="my-3 bg-red-600"></a-divider>

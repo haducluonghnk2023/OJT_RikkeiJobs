@@ -17,9 +17,9 @@
           <option
             v-for="certificate in certificateTypes"
             :key="certificate.id"
-            :value="certificate.type"
+            :value="getCertTypeStr(certificate.type)"
           >
-            {{ certificate.type }}
+            {{ getCertTypeStr(certificate.type) }}
           </option>
         </select>
       </div>
@@ -28,20 +28,15 @@
         <label for="score" class="block text-gray-700 font-bold mb-2">
           Xếp loại
         </label>
-        <select
+        <a-select
           id="score"
-          v-model="formData.certificateValue"
-          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-red-400"
-          required
-        >
-          <option
-            v-for="value in certificateValues"
-            :key="value"
-            :value="value"
-          >
-            {{ value }}
-          </option>
-        </select>
+          v-model:value="formData.certificateValue"
+          placeholder="Vui lòng chọn chứng chỉ trước"
+          :disabled="!formData.certificateType || formData.certificateType === 'default'"
+          class="w-full"
+          :options="certificateValueOptions"
+          size="large"
+        />
       </div>
 
       <div class="mb-4">
@@ -92,9 +87,9 @@
 </template>
 
 <script setup>
-import { PlusCircleFilled } from "@ant-design/icons-vue";
 import { ref, reactive, onMounted, computed } from "vue";
 import { useStore } from "vuex";
+import { message } from "ant-design-vue";
 
 const store = useStore();
 
@@ -115,21 +110,50 @@ const user = computed(() => store.getters.User);
 
 ///
 const certificateTypes = computed(() => {
-  return store.getters.allCertificateTypes;
+  return store.getters.allCertificateTypes || [];
+});
+
+const getCertTypeStr = (t) => {
+  if (t == null) return "";
+  if (typeof t === "string") return t;
+  if (typeof t === "object") return t.name ?? t.label ?? t.value ?? "";
+  return String(t);
+};
+
+const toDisplayValue = (v) => {
+  if (v == null) return "";
+  if (typeof v === "string" || typeof v === "number") return String(v);
+  if (typeof v === "object" && v !== null) return v.label ?? v.name ?? v.value ?? String(v);
+  return String(v);
+};
+
+const certificateValueOptions = computed(() => {
+  const vals = certificateValues.value;
+  if (!vals || !Array.isArray(vals)) return [];
+  return vals.map((v) => {
+    const str = toDisplayValue(v);
+    return { label: str, value: str };
+  });
 });
 
 const updateSelectValues = () => {
   const selectedCertificate = certificateTypes.value.find(
-    (cert) => cert.type === formData.certificateType
+    (cert) => getCertTypeStr(cert.type) === formData.certificateType
   );
-  console.log(selectedCertificate);
-  formData.certificateId = selectedCertificate.id;
+  formData.certificateId = selectedCertificate?.id;
 
-  certificateValues.value = selectedCertificate
-    ? selectedCertificate.value
-    : [];
-  console.log(certificateValues.value);
-  formData.certificateValue = certificateValues.value[0] || "";
+  let vals = [];
+  const rawVal = selectedCertificate?.value ?? selectedCertificate?.values;
+  if (rawVal) {
+    const arr = Array.isArray(rawVal)
+      ? rawVal
+      : typeof rawVal === "string"
+        ? rawVal.split(",").map((s) => s.trim()).filter(Boolean)
+        : [];
+    vals = arr.map((v) => toDisplayValue(v));
+  }
+  certificateValues.value = vals;
+  formData.certificateValue = vals[0] ?? "";
 };
 
 const cancel = () => {
@@ -137,6 +161,10 @@ const cancel = () => {
 };
 
 const submitForm = async () => {
+  if (!formData.certificateValue) {
+    message.warning("Vui lòng chọn xếp loại");
+    return;
+  }
   isSubmitting.value = true;
 
   const newCertificate = {

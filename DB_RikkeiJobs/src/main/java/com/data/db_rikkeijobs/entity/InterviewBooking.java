@@ -36,7 +36,8 @@ public class InterviewBooking {
     private Long userId;
     
     @Column(name = "status")
-    private String status;
+    @Convert(converter = InterviewBookingStatusConverter.class)
+    private InterviewBookingStatus status;
     
     @Column(name = "create_at")
     private LocalDateTime createAt;

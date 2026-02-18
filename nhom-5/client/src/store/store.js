@@ -10,6 +10,7 @@ import candidateDetail from "./modules/candidateDetail.module";
 import jobs from "./modules/jobs.module";
 import jobsDetail from "./modules/jobsDetail.module";
 import provinces from "./modules/province.module";
+import favorites from "./modules/favorites.module";
 
 const store = createStore({
   modules: {
@@ -24,6 +25,7 @@ const store = createStore({
     jobs,
     jobsDetail,
     provinces,
+    favorites,
   },
 });
 export default store;

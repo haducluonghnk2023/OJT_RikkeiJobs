@@ -18,15 +18,12 @@ public class InterviewBookingRank {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "interview_booking_id", nullable = false)
-    private Long interviewBookingId;
-    
     @Column(name = "rank_value", nullable = false)
     private String rankValue;
     
     // Quan hệ với InterviewBooking
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "interview_booking_id", insertable = false, updatable = false)
+    @JoinColumn(name = "interview_booking_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private InterviewBooking interviewBooking;
 }

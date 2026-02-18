@@ -1,5 +1,7 @@
 package com.data.db_rikkeijobs.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +14,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CertificateTypeValue {
     
     @Id
@@ -28,6 +31,7 @@ public class CertificateTypeValue {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "certificate_type_id", insertable = false, updatable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonBackReference
     private CertificateType certificateType;
 }
 

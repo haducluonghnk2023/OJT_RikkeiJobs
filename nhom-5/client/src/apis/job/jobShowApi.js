@@ -10,7 +10,8 @@ import { extractResponseData } from "@/utils/apiHelper";
  */
 export const getAllJobs = async () => {
   try {
-    const response = await apiClient.get(API_ENDPOINTS.JOBS);
+    // Only expose verified jobs to the public client
+    const response = await apiClient.get(`${API_ENDPOINTS.JOBS}/flight/verified`);
     return extractResponseData(response);
   } catch (error) {
     handleApiError(error, "lấy danh sách công việc");
@@ -26,13 +27,8 @@ export const getAllJobs = async () => {
  */
 export const getShowJobByPage = async (page, limit) => {
   try {
-    // Java backend uses flight parameter to filter
-    const params = buildQueryString({
-      flight: "verified",
-    });
-
-    const response = await apiClient.get(`${API_ENDPOINTS.JOBS}${params ? '?' + params : ''}`);
-    const allJobs = extractData(response);
+    const response = await apiClient.get(`${API_ENDPOINTS.JOBS}/flight/verified`);
+    const allJobs = extractResponseData(response);
     
     // Client-side pagination (backend can be updated later to support pagination)
     const startIndex = (page - 1) * limit;
@@ -55,8 +51,8 @@ export const getShowJobByPage = async (page, limit) => {
  */
 export const getDistinctIndustries = async () => {
   try {
-    const response = await apiClient.get(API_ENDPOINTS.JOBS);
-    const jobs = extractData(response);
+    const response = await apiClient.get(`${API_ENDPOINTS.JOBS}/flight/verified`);
+    const jobs = extractResponseData(response);
     const industries = getDistinctValues(jobs, "industry");
     return industries;
   } catch (error) {
@@ -74,9 +70,9 @@ export const getDistinctIndustries = async () => {
  */
 export const getJobsByLocation = async (location, page = 1, limit = 10) => {
   try {
-    // Get all jobs first, then filter by location (can be optimized later with backend filter)
-    const response = await apiClient.get(API_ENDPOINTS.JOBS);
-    const allJobs = extractData(response);
+    // Get verified jobs first, then filter by location (can be optimized later with backend filter)
+    const response = await apiClient.get(`${API_ENDPOINTS.JOBS}/flight/verified`);
+    const allJobs = extractResponseData(response);
     
     // Filter by province
     const filteredJobs = allJobs.filter(job => job.province === location);
@@ -104,8 +100,8 @@ export const getJobsByLocation = async (location, page = 1, limit = 10) => {
  */
 export const getRandomJobs = async (page = 1, limit = 10) => {
   try {
-    const response = await apiClient.get(API_ENDPOINTS.JOBS);
-    const allJobs = extractData(response);
+    const response = await apiClient.get(`${API_ENDPOINTS.JOBS}/flight/verified`);
+    const allJobs = extractResponseData(response);
     const shuffledJobs = shuffleArray(allJobs);
     
     // Client-side pagination

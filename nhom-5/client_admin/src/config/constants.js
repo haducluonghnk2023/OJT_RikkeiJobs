@@ -5,6 +5,7 @@ const API_BASE_PATH = "/api/v1";
 export const API_ENDPOINTS = {
   // Auth
   LOGIN: `${API_BASE_PATH}/auth/login`,
+  LOGOUT: `${API_BASE_PATH}/auth/logout`,
   
   // Users
   USERS: `${API_BASE_PATH}/users`,

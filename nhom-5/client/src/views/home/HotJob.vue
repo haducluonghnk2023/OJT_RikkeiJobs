@@ -1,20 +1,15 @@
 <template>
-  <div>
-    <!--  -->
-    <div class="flex justify-between md:flex-row md:px-[136px] items-center">
-      <div>
-        <p class="md:text-2xl font-semibold">Việc làm nổi bật</p>
-      </div>
-      <div class="flex items-center text-red-700 cursor-pointer mt-4 md:mt-0">
-        <router-link to="/homepage/listJob" class="mr-2"
-          >Xem tất cả</router-link
-        >
+  <div ref="jobsTopRef" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <p class="text-xl sm:text-2xl font-semibold">Việc làm nổi bật</p>
+      <div class="flex items-center text-red-700 cursor-pointer">
+        <router-link to="/homepage/listJob" class="mr-2">Xem tất cả</router-link>
         <font-awesome-icon :icon="['fas', 'arrow-right']" />
       </div>
     </div>
-    <!--  -->
-    <div class="md:px-[133px] md:mb-4 flex justify-between">
-      <div class="flex md:gap-4">
+
+    <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div class="flex gap-3">
         <!-- Nút Tất cả -->
         <button
           :class="{
@@ -22,7 +17,7 @@
             'bg-[rgba(244,244,244,1)] text-gray-600':
               activeLocation !== 'random',
           }"
-          class="w-[103px] h-[40px] rounded-lg transition-all"
+          class="px-4 py-2 rounded-lg transition-all"
           @click="handleRandomFilter"
         >
           Tất cả
@@ -30,24 +25,24 @@
       </div>
 
       <!-- Dropdown lọc theo địa điểm - góc bên phải -->
-      <div class="relative">
+      <div ref="provinceDropdownRef" class="relative">
         <div
-          class="flex md:w-[276px] h-[48px] px-[16px] items-center border-[rgba(221,221,221,1)] border-2 bg-[rgba(255,255,255,1)] rounded-md cursor-pointer hover:border-red-500 transition-all relative"
+          class="flex w-full sm:w-[276px] h-12 px-4 items-center border-[rgba(221,221,221,1)] border-2 bg-[rgba(255,255,255,1)] rounded-md cursor-pointer hover:border-red-500 transition-all relative"
           @click.stop="toggleProvinceDropdown"
         >
-          <div class="flex items-center gap-2 justify-center">
+          <div class="flex items-center gap-2 h-full">
             <p
-              class="text-[rgba(145,145,145,1)] font-semibold text-ic whitespace-nowrap leading-none"
+              class="text-[rgba(145,145,145,1)] font-semibold text-ic whitespace-nowrap leading-none m-0"
             >
               Lọc theo:
             </p>
             <p
-              class="text-[rgba(61,61,61,1)] font-semibold text-ic truncate max-w-[120px] leading-none"
+              class="text-[rgba(61,61,61,1)] font-semibold text-ic truncate max-w-[120px] leading-none m-0"
             >
               {{ selectedProvinceName || "Địa điểm" }}
             </p>
           </div>
-          <div class="absolute right-[16px] top-1/2 -translate-y-1/2">
+          <div class="absolute right-4 top-1/2 -translate-y-1/2">
             <font-awesome-icon
               :icon="['fas', 'chevron-down']"
               :class="{ 'rotate-180': showProvinceDropdown }"
@@ -60,7 +55,7 @@
         <transition name="dropdown">
           <div
             v-if="showProvinceDropdown"
-            class="absolute right-0 mt-2 w-[320px] max-h-[400px] overflow-hidden bg-white border border-gray-200 rounded-lg shadow-xl z-[100]"
+            class="absolute right-0 mt-2 w-[90vw] sm:w-[320px] max-w-[320px] max-h-[400px] overflow-hidden bg-white border border-gray-200 rounded-lg shadow-xl z-[100]"
             @click.stop
           >
             <div class="p-3">
@@ -73,20 +68,21 @@
                 @input.stop
               />
               <div class="max-h-[320px] overflow-y-auto custom-scrollbar">
-                <div
-                  v-if="filteredProvinces.length > 0"
-                  v-for="province in filteredProvinces"
-                  :key="province.code || province.id"
-                  @click="selectProvince(province.name)"
-                  class="px-3 py-2.5 hover:bg-red-50 cursor-pointer rounded-md transition-colors text-sm"
-                  :class="{
-                    'bg-red-50 text-red-700 font-semibold':
-                      activeLocation === province.name,
-                    'text-gray-700': activeLocation !== province.name,
-                  }"
-                >
-                  {{ province.name }}
-                </div>
+                <template v-if="filteredProvinces.length > 0">
+                  <div
+                    v-for="province in filteredProvinces"
+                    :key="province.code || province.id"
+                    @click="selectProvince(province.name)"
+                    class="px-3 py-2.5 hover:bg-red-50 cursor-pointer rounded-md transition-colors text-sm"
+                    :class="{
+                      'bg-red-50 text-red-700 font-semibold':
+                        activeLocation === province.name,
+                      'text-gray-700': activeLocation !== province.name,
+                    }"
+                  >
+                    {{ province.name }}
+                  </div>
+                </template>
                 <div v-else class="px-3 py-2 text-gray-500 text-center text-sm">
                   {{ isLoadingProvinces ? "Đang tải..." : "Không tìm thấy" }}
                 </div>
@@ -96,32 +92,24 @@
         </transition>
       </div>
     </div>
-    <!--  -->
-    <div class="flex justify-center">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0.5">
-        <div
-          class="w-full h-auto p-4"
-          v-for="(job, index) in jobsWithDaysLeft"
-          :key="index"
-        >
-          <!-- Job Card 1 -->
-          <div
-            class="bg-white w-[395px] h-[186px] rounded-lg shadow-md border border-gray-200 p-5 hover:shadow-lg transition-shadow relative"
-          >
+    <div class="mt-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="w-full min-w-0" v-for="(job, index) in jobsWithDaysLeft" :key="job?.id ?? index">
+          <div class="bg-white w-full rounded-lg shadow-md border border-gray-200 p-4 sm:p-5 hover:shadow-lg transition-shadow relative overflow-hidden">
             <div class="flex gap-5">
               <img
                 :src="job.image"
                 alt="Job Image for Software Engineer"
-                class="rounded-md object-cover mb-4 w-[80px] h-[80px]"
+                class="rounded-md object-cover mb-4 w-20 h-20 shrink-0"
               />
-              <div class="justify-between items-start gap-4 mb-3">
+              <div class="justify-between items-start gap-4 mb-3 min-w-0 flex-1 overflow-hidden">
                 <p
                   @click="handleClick(job.id)"
                   class="!text-[16px] font-semibold text-red-700 leading-tight hover:cursor-pointer"
                 >
-                  {{ job.title }}
+                  <span class="line-clamp-2">{{ job.title }}</span>
                 </p>
-                <div class="flex">
+                <div class="flex flex-wrap gap-2">
                   <!-- Hiển thị tối đa 3 hoặc toàn bộ dựa trên trạng thái isExpanded -->
                   <p
                     v-for="(rank, eduIndex) in isExpanded
@@ -129,7 +117,7 @@
                       : job?.rank?.slice(0, 3)"
                     :key="eduIndex"
                     :class="[
-                      'w-[62px] h-[26px] rounded-xl flex justify-center items-center text-[14px] font-semibold',
+                      'px-3 h-[26px] rounded-xl flex justify-center items-center text-[14px] font-semibold',
                       {
                         'bg-[rgba(236,253,243,1)] text-[rgba(2,122,72,1)]':
                           rank === 'Fresher',
@@ -156,9 +144,7 @@
                 </div>
               </div>
             </div>
-            <div
-              class="flex items-center w-[322px] h-[18px] gap-[12px] space-x-2 m-0 p-0 text-[12px] mb-4"
-            >
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 m-0 p-0 text-[12px] mb-4 min-w-0">
               <div
                 class="flex gap-[8px] items-center w-auto h-[18px] font-semibold"
               >
@@ -168,8 +154,8 @@
                     class="text-[rgba(188,34,40,1)]"
                   />
                 </i>
-                <span class="text-[12px] h-[18px] font-[400] truncate">
-                  {{ job.salary }} {{ job.salaryCurrent }}
+                <span class="text-[12px] h-[18px] font-[400] truncate max-w-[180px]">
+                  {{ formatSalary(job.salary) }}
                 </span>
               </div>
               <div class="flex items-center truncate gap-1">
@@ -181,13 +167,13 @@
                   >
                     <img
                       class="w-[7.31px] h-[6.96px]"
-                      src="../../assets/img/vn.svg"
+                      :src="vnSvg"
                       alt="Vietnam"
                     />
                   </div>
                 </span>
 
-                <div class="truncate">
+                <div class="truncate max-w-[160px]">
                   {{ job.province }}
                 </div>
               </div>
@@ -196,35 +182,39 @@
                 <i class="fas fa-briefcase text-[rgba(188,34,40,1)] mr-1"
                   ><font-awesome-icon :icon="['fas', 'briefcase']"
                 /></i>
-                <div class="truncate">
+                <div class="truncate max-w-[160px]">
                   {{ job.workingTime }}
                 </div>
               </div>
             </div>
             <p
               v-if="jobsWithDaysLeft"
-              class="text-gray-500 w-[265px] text-[12px] h-[18px]"
+              class="text-gray-500 text-[12px] leading-tight"
             >
               Cập nhật {{ job.timeAgo }} - Còn
               <span class="font-semibold text-black">{{ job.daysLeft }}</span>
               ngày để ứng tuyển
             </p>
 
-            <div
-              class="absolute w-[32px] top-[140px] h-[32px] flex justify-center items-center right-4 text-gray-400 hover:text-gray-600 heart"
+            <button
+              @click.stop="toggleFavorite(job.id)"
+              type="button"
+              class="absolute w-[32px] top-4 h-[32px] flex justify-center items-center right-4 rounded border heart transition-colors"
+              :class="{
+                'text-red-500 bg-red-50 border-red-200': isFavorite(job.id),
+                'text-gray-400 hover:text-gray-600 border-[rgba(221,221,221,1)]': !isFavorite(job.id),
+              }"
             >
-              <div class="bg-[rgba(255,255,255,1)]">
-                <font-awesome-icon
-                  :icon="['fas', 'heart']"
-                  class="text-[rgba(221,221,221,1)] heart-item"
-                />
-              </div>
-            </div>
+              <font-awesome-icon
+                :icon="['fas', 'heart']"
+                :class="isFavorite(job.id) ? 'text-red-500' : 'text-[rgba(221,221,221,1)]'"
+              />
+            </button>
           </div>
         </div>
       </div>
     </div>
-    <div class="flex items-center md:justify-end space-x-2 md:mr-[130px] mt-5">
+    <div class="mt-6 flex flex-wrap items-center justify-center sm:justify-end gap-2">
       <button
         @click="changePage(currentPage - 1)"
         v-if="currentPage > 1"
@@ -258,11 +248,15 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
+import { formatSalary } from "@/utils/formatters";
+import vnSvg from "@/assets/img/vn.svg";
 const router = useRouter();
 const store = useStore();
+const jobsTopRef = ref(null);
+const provinceDropdownRef = ref(null);
 const jobs = computed(() => store.state.jobs.jobs);
 const currentPage = computed(() => store.state.jobs.currentPage);
 const totalPages = computed(() => store.getters.totalPagesJob);
@@ -323,6 +317,7 @@ const selectProvince = (provinceName) => {
     location: provinceName,
     page: currentPage,
   });
+  scrollToJobsTop();
 };
 
 const handleLocationFilter = (location) => {
@@ -330,13 +325,15 @@ const handleLocationFilter = (location) => {
   selectedProvinceName.value = location;
   const currentPage = store.state.jobs.currentPage || 1;
   store.dispatch("getJobsByLocation", { location, page: currentPage });
+  scrollToJobsTop();
 };
 
 // Đóng dropdown khi click bên ngoài
 const handleClickOutside = (event) => {
-  if (!event.target.closest(".relative")) {
-    showProvinceDropdown.value = false;
-  }
+  const target = event?.target;
+  const container = provinceDropdownRef.value;
+  if (!container || !(target instanceof Node)) return;
+  if (!container.contains(target)) showProvinceDropdown.value = false;
 };
 
 onMounted(() => {
@@ -386,7 +383,7 @@ const jobsWithDaysLeft = computed(() => {
 
   return resultArray;
 });
-console.log(jobsWithDaysLeft); // In ra jobsWithDaysLeft
+// console.log(jobsWithDaysLeft); // debug
 
 // console.log(jobsWithDaysLeft, "33333");
 
@@ -419,18 +416,30 @@ const visiblePages = computed(() => {
   return pages;
 });
 
-const changePage = (page) => {
+const scrollToJobsTop = async () => {
+  await nextTick();
+  jobsTopRef.value?.scrollIntoView({ behavior: "smooth", block: "start" });
+};
+
+const changePage = async (page) => {
   if (page === "...") return; // Không thay đổi trang nếu là "..."
-  store.dispatch("getJobsByPage", page);
+  await store.dispatch("getJobsByPage", page);
+  await scrollToJobsTop();
 };
 const handleClick = (id) => {
   router.push(`/homepage/listJob/jobDetail/${id}`);
+};
+
+const isFavorite = (jobId) => store.getters["favorites/isFavorite"]?.(jobId) ?? false;
+const toggleFavorite = (jobId) => {
+  store.dispatch("favorites/toggleFavorite", jobId);
 };
 const handleRandomFilter = () => {
   activeLocation.value = "random";
   selectedProvinceName.value = "";
   const currentPage = store.state.jobs.currentPage || 1;
   store.dispatch("getRandomJobs", { page: currentPage });
+  scrollToJobsTop();
 };
 
 onMounted(async () => {
@@ -443,11 +452,11 @@ onMounted(async () => {
     isLoadingProvinces.value = false;
 
     // Debug: Log để kiểm tra data
-    console.log("Provinces loaded:", store.state.provinces.provinces);
+    // console.log("Provinces loaded:", store.state.provinces.provinces);
 
     // Load jobs - đảm bảo load xong mới render
     await Promise.all([
-      store.dispatch("getAllUsers"),
+      store.dispatch("auth/getAllUsers"),
       store.dispatch("getJobsByPage", 1),
     ]);
   } catch (error) {

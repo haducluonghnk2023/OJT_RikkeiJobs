@@ -1,5 +1,7 @@
 package com.data.db_rikkeijobs.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Cv {
     
     @Id
@@ -42,10 +45,12 @@ public class Cv {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "language_id", insertable = false, updatable = false)
+    @JsonIgnore
     private CvLanguage cvLanguage;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @JsonIgnore
     private User user;
 }
 

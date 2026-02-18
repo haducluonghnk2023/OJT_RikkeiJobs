@@ -5,15 +5,15 @@
         <div>
           <img
             class="absolute top-[-174px] left-[1px] w-[490px] h-[300px]"
-            src="../../assets/decor.svg"
+            :src="decorSvg"
             alt=""
           />
         </div>
 
         <!-- Logo container -->
         <div class="flex items-center mb-8">
-          <img src="../../assets/rikkei.svg" alt="Rikkei" class="h-8" />
-          <img src="../../assets/jobs.svg" alt="Jobs" class="h-8 ml-1" />
+          <img :src="rikkeiSvg" alt="Rikkei" class="h-8" />
+          <img :src="jobsSvg" alt="Jobs" class="h-8 ml-1" />
         </div>
 
         <!-- Form content -->
@@ -166,6 +166,9 @@
 
 <script setup>
 import { reactive, computed, onMounted, ref } from "vue";
+import decorSvg from "@/assets/decor.svg";
+import rikkeiSvg from "@/assets/rikkei.svg";
+import jobsSvg from "@/assets/jobs.svg";
 import {
   UserOutlined,
   LockOutlined,

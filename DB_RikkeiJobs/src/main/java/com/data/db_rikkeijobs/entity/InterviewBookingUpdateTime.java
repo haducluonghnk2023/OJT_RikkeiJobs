@@ -18,15 +18,12 @@ public class InterviewBookingUpdateTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "interview_booking_id", nullable = false)
-    private Long interviewBookingId;
-    
     @Column(name = "update_time", nullable = false)
     private String updateTime;
     
     // Quan hệ với InterviewBooking
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "interview_booking_id", insertable = false, updatable = false)
+    @JoinColumn(name = "interview_booking_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private InterviewBooking interviewBooking;
 }

@@ -7,11 +7,14 @@ import com.data.db_rikkeijobs.exception.HttpForbidden;
 import com.data.db_rikkeijobs.exception.HttpNotFound;
 import com.data.db_rikkeijobs.exception.HttpUnauthorized;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.TypeMismatchException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -92,6 +95,50 @@ public class GlobalExceptionHandler {
                         .code(HttpStatus.FORBIDDEN.value())
                         .status(HttpStatus.FORBIDDEN)
                         .message(ex.getMessage())
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<?> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        // Example: "Column 'user_id' cannot be null"
+        log.warn("Data integrity violation", ex);
+        String detail = ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : ex.getMessage();
+        String message = "Database constraint violation";
+        if (detail != null && detail.toLowerCase().contains("cannot be null")) {
+            message = "Missing required field (DB constraint): " + detail;
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ResponseWrapper.builder()
+                        .data(message)
+                        .code(HttpStatus.BAD_REQUEST.value())
+                        .status(HttpStatus.BAD_REQUEST)
+                        .message(message)
+                        .build()
+        );
+    }
+
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class, TypeMismatchException.class, NumberFormatException.class})
+    public ResponseEntity<?> handleTypeMismatch(Exception ex) {
+        log.warn("Request parameter/path variable type mismatch", ex);
+
+        String message = "Invalid request parameter";
+        if (ex instanceof MethodArgumentTypeMismatchException mismatch) {
+            String name = mismatch.getName();
+            Object value = mismatch.getValue();
+            String requiredType = mismatch.getRequiredType() != null ? mismatch.getRequiredType().getSimpleName() : "unknown";
+            message = "Invalid value for '" + name + "': " + value + " (expected " + requiredType + ")";
+        } else if (ex.getMessage() != null) {
+            message = ex.getMessage();
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ResponseWrapper.builder()
+                        .data(message)
+                        .code(HttpStatus.BAD_REQUEST.value())
+                        .status(HttpStatus.BAD_REQUEST)
+                        .message(message)
                         .build()
         );
     }

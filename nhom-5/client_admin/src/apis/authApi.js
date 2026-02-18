@@ -18,3 +18,16 @@ export const login = async (credentials) => {
   }
 };
 
+/**
+ * Logout (server clears cookies/session if any)
+ */
+export const logout = async () => {
+  try {
+    const response = await apiClient.post(API_ENDPOINTS.LOGOUT);
+    return extractResponseData(response);
+  } catch (error) {
+    handleApiError(error, "đăng xuất");
+    throw error;
+  }
+};
+

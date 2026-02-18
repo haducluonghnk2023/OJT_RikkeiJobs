@@ -24,7 +24,8 @@ export const getCvsData = async () => {
  */
 export const updateCvData = async (cv) => {
   try {
-    const response = await apiClient.patch(API_ENDPOINTS.CV_BY_ID(cv.id), cv);
+    const { id, ...payload } = cv || {};
+    const response = await apiClient.patch(API_ENDPOINTS.CV_BY_ID(id), payload);
     return extractResponseData(response);
   } catch (error) {
     handleApiError(error, "cập nhật CV");

@@ -139,7 +139,8 @@ const [messageApi, contextHolder] = message.useMessage();
 const imageSrc = ref(null);
 const store = useStore();
 
-const userLoginId = ref(JSON.parse(localStorage.getItem("token")));
+const tokenRaw = localStorage.getItem("token");
+const userLoginId = ref(tokenRaw ? JSON.parse(tokenRaw) : null);
 const user = computed(() => store.getters.User);
 
 // console.log("test1", user.value);
@@ -168,6 +169,8 @@ const errors = reactive({
 });
 //// hàm bất đồng bộ sẽ mất thời gian để thục hiện=> then sẽ dc chạy khi hàm bdb hoàn tất => để đảm bảo biến user có dữ liệu
 onMounted(async () => {
+  if (userLoginId.value == null) return;
+
   await store.dispatch("getUser", userLoginId.value).then(() => {
     if (user.value) {
       userProfile.userName = user.value.userName;
@@ -287,7 +290,9 @@ const updateProfile = () => {
   messageApi.success("Cập nhật thành công!");
 
   store.dispatch("updateUser", { ...userProfile, id: userId });
-  store.dispatch("getUser", userLoginId.value);
+  if (userLoginId.value != null) {
+    store.dispatch("getUser", userLoginId.value);
+  }
 };
 const checkPhoneNumber = (phone) => {
   const phoneString = String(phone);
