@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-7xl mx-auto p-4">
+  <div class="max-w-7xl mx-auto p-4 page-enter">
     <!-- <div class="flex justify-between items-center mb-10">
       <div
         class="flex gap-1 items-center space-x-3 w-[337px] h-[48px] bd px-2.5"
@@ -28,14 +28,14 @@
     </div> -->
 
     <!-- Header -->
-    <div class="flex justify-between items-center mb-3 mt-10">
+    <div class="surface-glass flex justify-between items-center mb-5 mt-8 p-4 sm:p-5">
       <h2 class="text-2xl font-bold header-item">Tất cả ứng viên</h2>
       <div class="flex gap-4 header-item1 items-center">
         Sắp xếp theo:
         <div class="relative">
           <button
             @click="toggleDropdown"
-            class="flex items-center space-x-2 cursor-pointer"
+            class="flex items-center space-x-2 cursor-pointer px-3 py-2 rounded-xl bg-white border border-slate-200"
           >
             <div class="header-item-text">
               {{ sortOption === "asc" ? "Từ A-Z" : "Từ Z-A" }}
@@ -47,7 +47,7 @@
           </button>
           <div
             v-if="isDropdownOpen"
-            class="absolute bg-white border rounded-lg z-[1] shadow-md mt-2 w-[100px]"
+            class="absolute bg-white border rounded-xl z-[1] shadow-md mt-2 w-[110px]"
           >
             <div
               @click="setSortOption('asc')"
@@ -66,18 +66,35 @@
       </div>
     </div>
 
-    <hr class="bg-red-500 mb-6" />
+    <hr class="bg-red-500/60 mb-6" />
+
+    <div v-if="isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div
+        v-for="idx in 8"
+        :key="`candidate-skeleton-${idx}`"
+        class="bg-white/80 rounded-2xl border border-white/80 overflow-hidden"
+      >
+        <div class="h-48 bg-slate-200 skeleton-shimmer"></div>
+        <div class="p-4 space-y-3">
+          <div class="h-5 w-2/3 rounded bg-slate-200 skeleton-shimmer"></div>
+          <div class="h-4 w-1/3 rounded bg-slate-200 skeleton-shimmer"></div>
+          <div class="h-4 w-full rounded bg-slate-200 skeleton-shimmer"></div>
+          <div class="h-4 w-5/6 rounded bg-slate-200 skeleton-shimmer"></div>
+        </div>
+      </div>
+    </div>
 
     <!-- Candidates Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <div
-        v-for="candidate in activeCandidates"
+        v-for="(candidate, index) in activeCandidates"
         :key="candidate.id"
-        class="bg-white rounded-lg shadow transition-shadow duration-300 overflow-hidden"
+        class="bg-white/85 backdrop-blur rounded-2xl shadow transition-all duration-300 overflow-hidden border border-white/70 stagger-item"
+        :style="{ '--i': index }"
         @click="handleClick(candidate.id)"
         :class="{
           'cursor-not-allowed': !currentUser || currentUser.status !== 'active',
-          'hover:shadow-lg hover:cursor-pointer':
+          'hover:shadow-lg hover:cursor-pointer hover:-translate-y-1':
             currentUser && currentUser.status === 'active',
         }"
       >
@@ -90,7 +107,7 @@
           />
           <span
             :class="[
-              'absolute top-4 right-4 px-3 py-1 rounded-full text-sm font-medium',
+              'absolute top-4 right-4 px-3 py-1 rounded-full text-sm font-medium shadow-sm',
               getPositionColor(candidate.level),
             ]"
           >
@@ -143,9 +160,23 @@
         </div>
       </div>
     </div>
-    <div class="mt-4 flex justify-end space-x-2">
+
+    <div
+      v-if="!isLoading && activeCandidates.length === 0"
+      class="empty-state-card p-8 text-center mt-2"
+    >
+      <p class="text-lg font-semibold text-slate-800">Chưa có ứng viên phù hợp</p>
+      <p class="text-sm text-slate-500 mt-1">
+        Thử tải lại hoặc đổi cách sắp xếp để xem thêm dữ liệu.
+      </p>
+      <button class="gradient-btn mt-4 px-4 h-10 rounded-xl font-medium" @click="fetchPage(1)">
+        Tải lại danh sách
+      </button>
+    </div>
+
+    <div v-if="!isLoading && activeCandidates.length > 0" class="mt-6 flex justify-end space-x-2">
       <button
-        class="px-4 py-2 border rounded-lg"
+        class="px-4 py-2 border rounded-xl bg-white"
         :class="{ 'opacity-50 cursor-not-allowed': currentPage === 1 }"
         @click="previousPage"
         :disabled="currentPage === 1"
@@ -155,14 +186,14 @@
       <button
         v-for="page in totalPages"
         :key="page"
-        class="px-4 py-2 border rounded-lg"
-        :class="{ 'bg-blue-500 text-white': currentPage === page }"
+        class="px-4 py-2 border rounded-xl bg-white"
+        :class="{ 'gradient-btn text-white border-transparent': currentPage === page }"
         @click="fetchPage(page)"
       >
         {{ page }}
       </button>
       <button
-        class="px-4 py-2 border rounded-lg"
+        class="px-4 py-2 border rounded-xl bg-white"
         :class="{
           'opacity-50 cursor-not-allowed': currentPage === totalPages,
         }"
@@ -179,12 +210,13 @@
 import { onMounted, ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
+import { message } from "ant-design-vue";
 
 const router = useRouter();
 const store = useStore();
 const isDropdownOpen = ref(false);
 const sortOption = ref("asc");
-const candidates = ref([]);
+const isLoading = ref(true);
 const totalPages = computed(() => store.getters.totalPagesCandidate);
 
 const currentPage = computed(() => store.state.candidate.currentPage);
@@ -218,7 +250,6 @@ const activeCandidates = computed(() =>
     (user) => String(user?.status || "").toLowerCase() === "active" && user.role === "user"
   )
 );
-console.log(activeCandidates);
 
 // console.log(store);
 const currentUser = computed(() => store.state.user.userLogin); // Giả sử bạn lưu người dùng hiện tại trong module auth
@@ -234,12 +265,16 @@ const getPositionColor = (role) => {
   return colors[role] || "bg-gray-100 text-gray-800";
 };
 
-const fetchPage = (page) => {
-  // console.log(sortOption.value);
-  if (sortOption.value === "asc") {
-    store.dispatch("getCandidatesByPageA", page);
-  } else {
-    store.dispatch("getCandidatesByPageDe", page);
+const fetchPage = async (page) => {
+  isLoading.value = true;
+  try {
+    if (sortOption.value === "asc") {
+      await store.dispatch("getCandidatesByPageA", page);
+    } else {
+      await store.dispatch("getCandidatesByPageDe", page);
+    }
+  } finally {
+    isLoading.value = false;
   }
 };
 
@@ -255,15 +290,20 @@ const nextPage = () => {
   }
 };
 
+const hasCv = () => store.getters.hasCv;
 const handleClick = (id) => {
   if (!currentUser || String(currentUser.value?.status || "").toLowerCase() !== "active") {
+    return;
+  }
+  if (currentUser.value?.role === "user" && !hasCv()) {
+    message.warning("Bạn cần tải CV lên để xem chi tiết ứng viên.");
     return;
   }
   router.push(`/homepage/candidate/candidateDetail/${id}`);
 };
 
-onMounted(() => {
-  store.dispatch("getCandidatesByPageA", 1);
+onMounted(async () => {
+  await fetchPage(1);
 });
 </script>
 

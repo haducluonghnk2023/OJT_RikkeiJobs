@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-full h-full">
+  <div class="relative w-full h-full page-enter">
     <div
       class="fixed inset-0 bg-gray-800 bg-opacity-50 z-10"
       v-if="isAddModalOpen || isEditModalOpen"
@@ -23,19 +23,19 @@
       </div>
     </div>
 
-    <div class="bg-custom p-6 z-0">
+    <div class="p-6 z-0">
       <div class="max-w-[1200px] mx-auto">
-        <div class="flex justify-between mb-[24px]">
+        <div class="surface-glass p-5 sm:p-6 flex justify-between mb-[24px]">
           <div>
-            <h2 class="text-[18px] font-[600]">Danh sách chứng chỉ</h2>
-            <p class="font-[400] text-[16px] text-gray-700">
+            <h2 class="text-[20px] font-[700]">Danh sách chứng chỉ</h2>
+            <p class="font-[400] text-[14px] text-gray-600 mb-0">
               Hãy xem và cập nhật chứng chỉ của bạn
             </p>
           </div>
           <div>
             <button
               @click="isAddModalOpen = true"
-              class="bg-[#f8e9ea] gap-[4px] text-[#ab1f24] flex items-center justify-center border-0 w-[200px] h-[48px] font-[600] text-[16px] rounded-md"
+              class="gradient-btn gap-[4px] flex items-center justify-center border-0 w-[200px] h-[44px] font-[600] text-[15px] rounded-xl"
             >
               <PlusCircleFilled />Thêm chứng chỉ
             </button>
@@ -44,7 +44,7 @@
       </div>
 
       <!-- Table -->
-      <div>
+      <div class="surface-glass p-3 sm:p-4">
         <a-table
           :columns="columns"
           :data-source="data"
@@ -128,7 +128,6 @@ const handleEdit = (record) => {
 
 const handleDelete = async (record) => {
   store.dispatch("removeCertificate", record.id);
-  console.log("test delete", record);
 };
 const data = computed(() => store.getters.Certificate);
 const columns = [
@@ -165,7 +164,6 @@ const pag = reactive({
 });
 
 const onChange = (pagination, filters, sorter) => {
-  console.log(pagination);
   pag.current = pagination.current;
   pag.currentPage = pagination.currentPage;
 };
@@ -173,8 +171,12 @@ onMounted(async () => {
   const userId = JSON.parse(localStorage.getItem("token"));
 
   if (userId) {
-    await store.dispatch("getUser", userId);
-    await store.dispatch("getCertificate");
+    if (!store.getters.User || String(store.getters.User.id) !== String(userId)) {
+      await store.dispatch("getUser", userId);
+    }
+    if (!Array.isArray(store.getters.Certificate) || store.getters.Certificate.length === 0) {
+      await store.dispatch("getCertificate");
+    }
   }
 });
 </script>
@@ -185,14 +187,14 @@ onMounted(async () => {
 
 /* Tăng độ specificity và thêm !important cho các thuộc tính */
 :deep(.custom-table .ant-table-thead > tr > th) {
-  background-color: #fff6f7 !important;
-  color: #ab1f24 !important;
+  background-color: #fff !important;
+  color: #7f1d1d !important;
   padding: 13px;
   text-align: center;
 }
 
 :deep(.custom-table .ant-table-thead > tr) {
-  background-color: #fff6f7 !important;
+  background-color: #fff !important;
 }
 
 :deep(.ant-table-thead > tr > th::before) {

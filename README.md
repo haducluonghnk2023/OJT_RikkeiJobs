@@ -108,9 +108,45 @@ npm run dev
 
 Admin sẽ chạy tại: `http://localhost:5174`
 
-## 🚧 Deployment
+## 🔄 CI/CD
 
-Phần deployment/CI-CD đã được **gỡ khỏi repo** để làm lại sau.
+### GitHub Actions
+
+- **CI** (`.github/workflows/ci.yml`): Chạy trên mỗi push/PR vào `main`, `develop`
+  - Backend: build + test (với MySQL service)
+  - Frontend Client: `npm ci && npm run build`
+  - Frontend Admin: `npm ci && npm run build`
+
+- **CD** (`.github/workflows/cd.yml`): Tự động deploy khi push lên `main`
+  - Build backend JAR + frontend dist
+  - Copy lên server qua SCP
+  - Restart backend (systemd hoặc java -jar)
+
+### Cấu hình Deploy tự động
+
+1. **Tạo SSH key** (nếu chưa có):
+   ```bash
+   ssh-keygen -t ed25519 -C "github-deploy" -f deploy_key -N ""
+   ```
+   - Copy `deploy_key.pub` vào server: `~/.ssh/authorized_keys`
+   - Nội dung `deploy_key` (private) → dùng làm Secret
+
+2. **Thêm Secrets** trong GitHub: **Settings > Secrets and variables > Actions**
+
+   | Secret | Mô tả |
+   |--------|-------|
+   | `SERVER_HOST` | IP hoặc domain server (VD: `192.168.1.100`) |
+   | `SERVER_USER` | User SSH (VD: `deploy`, `root`) |
+   | `SERVER_PORT` | Port SSH (mặc định 22, bỏ trống nếu dùng 22) |
+   | `DEPLOY_SSH_KEY` | Nội dung file private key SSH |
+   | `DEPLOY_BACKEND_PATH` | Thư mục backend (mặc định `/opt/rikkeijobs`) |
+   | `DEPLOY_CLIENT_PATH` | Thư mục static client (mặc định `/var/www/rikkeijobs/client`) |
+   | `DEPLOY_ADMIN_PATH` | Thư mục static admin (mặc định `/var/www/rikkeijobs/admin`) |
+
+3. **Chuẩn bị server**:
+   - Cài Java 21, Nginx (hoặc reverse proxy khác)
+   - Tạo thư mục và cấu hình Nginx serve `client` và `admin`
+   - (Tùy chọn) Tạo systemd service `rikkeijobs` để restart backend tự động
 
 ## 📁 Cấu Trúc Dự Án
 

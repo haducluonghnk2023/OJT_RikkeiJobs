@@ -35,8 +35,12 @@ public class User {
     @Column(name = "full_name")
     private String fullName;
     
-    @Column(nullable = false)
+    /** BCrypt hash - lưu vào cả password và password_hash vì DB có cả 2 cột NOT NULL */
+    @Column(name = "password", nullable = false)
     private String password;
+
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
     
     @Column(name = "status")
     private String status;
@@ -85,6 +89,14 @@ public class User {
     
     @Column(name = "birthdate")
     private LocalDate birthdate;
+
+    /** Đồng bộ password từ password_hash khi đọc user cũ chỉ có password_hash */
+    @PostLoad
+    void syncPasswordFromHash() {
+        if (password == null && passwordHash != null) {
+            password = passwordHash;
+        }
+    }
     
     // Quan hệ One-to-Many với UserForeignLanguage
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -1,6 +1,8 @@
 <template>
   <div class="font-sf-pro-display">
-    <router-view></router-view>
+    <router-view v-slot="{ Component }">
+      <component :is="Component" />
+    </router-view>
   </div>
 </template>
 

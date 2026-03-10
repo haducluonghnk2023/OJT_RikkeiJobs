@@ -1,12 +1,12 @@
 <template>
   <div>
     <section
-      class="py-12 sm:py-16 dark:bg-red-800 bg-cover bg-center bg-no-repeat overflow-hidden"
+      class="py-12 sm:py-16 dark:bg-red-800 bg-cover bg-center bg-no-repeat overflow-hidden rounded-[28px] border border-white/25 shadow-[0_18px_45px_rgba(16,24,40,0.18)]"
       style="
         background-image: url('https://res.cloudinary.com/dlcfbiayq/image/upload/v1767595676/2250f891827ff07cd21ae1be104e11e1b601b7c4_qa1lol.png');
       "
     >
-      <div class="max-w-7xl mx-auto px-4">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 class="text-2xl sm:text-3xl font-bold text-white mb-8 sm:mb-12">
           Tại sao chọn chúng tôi?
         </h2>
@@ -16,7 +16,7 @@
             v-for="(stat, index) in stats"
             :key="index"
             v-scroll-reveal="{ delay: 200 }"
-            class="bg-white rounded-lg p-6 w-full transform hover:-translate-y-1 transition-transform duration-300"
+            class="bg-white/95 rounded-2xl p-6 w-full border border-white/70 shadow-sm transform hover:-translate-y-1 transition-transform duration-300"
           >
             <p class="text-gray-600 text-sm mb-2">{{ stat.label }}</p>
             <p class="text-red-600 text-4xl font-bold">{{ stat.value }}</p>

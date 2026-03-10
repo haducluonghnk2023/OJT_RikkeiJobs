@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  backend:
+    image: ${DOCKER_USERNAME:-youruser}/rikkei-backend:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: ${DATABASE_URL:-jdbc:mysql://mysql:3306/db_rikkeijobs}
+      SPRING_DATASOURCE_USERNAME: ${DATABASE_USER:-root}
+      SPRING_DATASOURCE_PASSWORD: ${DATABASE_PASSWORD:-root}
+    depends_on:
+      - mysql
+
+  client:
+    image: ${DOCKER_USERNAME:-youruser}/rikkei-client:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+
+  admin:
+    image: ${DOCKER_USERNAME:-youruser}/rikkei-admin:latest
+    restart: unless-stopped
+    ports:
+      - "81:80"
+
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD:-root}
+      MYSQL_DATABASE: db_rikkeijobs
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+volumes:
+  mysql_data:

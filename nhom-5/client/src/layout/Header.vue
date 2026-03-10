@@ -1,68 +1,76 @@
 <template>
-  <header class="border-b border-gray-300">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
+  <header class="sticky top-0 z-50 border-b border-white/50 bg-white/78 backdrop-blur-xl shadow-[0_8px_24px_rgba(15,23,42,0.08)]">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
       <div class="flex items-center justify-between gap-4">
-        <!-- Left group: Logo + Desktop nav (keep nav near the left like the design) -->
         <div class="flex items-center gap-10 min-w-0">
           <div class="flex items-center gap-1 shrink-0">
             <img
               @click="handleChange"
-              :src="rikkeiSvg"
+              src="@/assets/rikkei.svg"
               class="w-[70.6px] h-[32.09px] image"
             />
             <img
               @click="handleChange"
-              :src="jobsSvg"
+              src="@/assets/jobs.svg"
               class="w-[63.12px] h-[21.4px] image"
             />
           </div>
 
-          <!-- Desktop nav -->
           <nav class="hidden lg:flex gap-6 items-center min-w-0">
-            <RouterLink
-              to="/homepage/listJob"
-              class="h-link font-sf-pro-display relative"
-              active-class="active"
-              @mouseover="showJobMenu = true"
+            <div
+              class="relative"
+              @mouseenter="showJobMenu = true"
               @mouseleave="showJobMenu = false"
             >
-              Việc làm
+              <RouterLink
+                to="/homepage/listJob"
+                class="h-link font-sf-pro-display nav-pill"
+                active-class="active"
+              >
+                Việc làm
+              </RouterLink>
               <div
                 v-if="showJobMenu"
-                class="absolute top-full left-0 bg-white shadow-lg rounded-md w-60 z-20"
+                class="absolute top-[calc(100%+8px)] left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-lg shadow-lg rounded-2xl w-72 z-30 border border-slate-100 p-1"
               >
-                <div
-                  class="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 transition-colors"
+                <router-link
+                  to="/homepage/listJob"
+                  class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 transition-colors text-gray-700 no-underline"
                 >
                   <SearchOutlined class="text-gray-500" />
-                  <router-link to="/homepage/listJob" class="text-gray-600"
-                    >Tìm kiếm việc làm</router-link
-                  >
-                </div>
-                <div
-                  class="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 transition-colors"
+                  <span class="whitespace-nowrap">Tìm kiếm việc làm</span>
+                </router-link>
+                <router-link
+                  to="/homepage/saveJob"
+                  class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 transition-colors text-gray-700 no-underline"
                 >
                   <HeartOutlined class="text-gray-500" />
-                  <router-link to="/homepage/saveJob" class="text-gray-600"
-                    >Việc làm đã lưu</router-link
-                  >
-                </div>
+                  <span class="whitespace-nowrap">Việc làm đã lưu</span>
+                </router-link>
               </div>
-            </RouterLink>
+            </div>
 
             <div
               v-if="user?.role === 'admin' || user?.role === 'user'"
-              class="h-link font-sf-pro-display hover:cursor-pointer"
+              class="h-link font-sf-pro-display hover:cursor-pointer nav-pill"
               active-class="active"
               @click="checkLogin"
             >
               Hồ sơ & CV
             </div>
 
-            <RouterLink class="h-link font-sf-pro-display" active-class="active" to="/about-us">
+            <RouterLink
+              class="h-link font-sf-pro-display nav-pill"
+              active-class="active"
+              to="/about-us"
+            >
               Về chúng tôi
             </RouterLink>
-            <RouterLink class="h-link font-sf-pro-display" active-class="active" to="contact">
+            <RouterLink
+              class="h-link font-sf-pro-display nav-pill"
+              active-class="active"
+              to="/contact"
+            >
               Liên hệ
             </RouterLink>
           </nav>
@@ -70,13 +78,17 @@
 
         <div class="flex items-center gap-3">
           <!-- Language -->
-          <div class="hidden sm:flex items-center gap-2 pr-4 border-r border-gray-300 relative">
+          <div
+            class="hidden sm:flex items-center gap-2 pr-4 border-r border-gray-300 relative"
+          >
             <img
               :src="currentLanguage.icon"
               alt="Language Icon"
               class="w-6 h-6 rounded-full z-20"
             />
-            <p class="text-gray-700 font-sf-pro-display m-0 flex items-center justify-center">
+            <p
+              class="text-gray-700 font-sf-pro-display m-0 flex items-center justify-center"
+            >
               {{ currentLanguage.text }}
             </p>
             <DownOutlined
@@ -87,9 +99,24 @@
               v-if="dropdownVisible"
               class="absolute top-full mt-2 bg-white border rounded-lg shadow-lg w-[150px] z-20 right-0"
             >
-              <button @click="changeLanguage('vn')" class="w-full text-left px-4 py-2">VN</button>
-              <button @click="changeLanguage('en')" class="w-full text-left px-4 py-2">EN</button>
-              <button @click="changeLanguage('ja')" class="w-full text-left px-4 py-2">Japanese</button>
+              <button
+                @click="changeLanguage('vn')"
+                class="w-full text-left px-4 py-2"
+              >
+                VN
+              </button>
+              <button
+                @click="changeLanguage('en')"
+                class="w-full text-left px-4 py-2"
+              >
+                EN
+              </button>
+              <button
+                @click="changeLanguage('ja')"
+                class="w-full text-left px-4 py-2"
+              >
+                Japanese
+              </button>
             </div>
           </div>
 
@@ -98,7 +125,11 @@
             <template v-if="userLoginId">
               <a-dropdown>
                 <a class="ant-dropdown-link" @click.prevent>
-                  <img :src="user?.avatar" alt="User Avatar" class="w-10 h-10 rounded-full" />
+                  <img
+                    :src="user?.avatar"
+                    alt="User Avatar"
+                    class="w-10 h-10 rounded-full"
+                  />
                 </a>
                 <template #overlay>
                   <a-menu class="w-[200px]">
@@ -126,7 +157,10 @@
                     <a-menu-item><span>Cài đặt</span> </a-menu-item>
                     <a-menu-divider />
                     <a-menu-item>
-                      <div @click="showConfirm" class="flex text-red align-center gap-2">
+                      <div
+                        @click="showConfirm"
+                        class="flex text-red align-center gap-2"
+                      >
                         <LogoutOutlined /> Đăng xuất
                       </div>
                     </a-menu-item>
@@ -137,22 +171,21 @@
             <template v-else>
               <router-link
                 to="/register"
-                class="hidden sm:flex text-gray-500 text-[14px] px-4 h-[40px] rounded items-center justify-center font-semibold"
+                class="hidden sm:flex text-gray-600 text-[14px] px-4 h-[40px] rounded-xl items-center justify-center font-semibold border border-slate-200 bg-white"
               >
                 Đăng ký
               </router-link>
               <router-link
                 to="/login"
-                class="bg-[#B60000] text-[14px] h-[40px] text-white px-4 rounded-lg flex items-center justify-center font-semibold"
+                class="gradient-btn text-[14px] h-[40px] px-4 rounded-xl flex items-center justify-center font-semibold shadow-sm"
               >
                 Đăng nhập
               </router-link>
             </template>
           </div>
 
-          <!-- Mobile menu button -->
           <button
-            class="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded border border-gray-200"
+            class="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl border border-gray-200 bg-white/80"
             @click="mobileMenuOpen = !mobileMenuOpen"
             aria-label="Toggle menu"
           >
@@ -161,14 +194,24 @@
         </div>
       </div>
 
-      <!-- Mobile nav -->
-      <div v-if="mobileMenuOpen" class="lg:hidden mt-4 border-t border-gray-200 pt-4">
+      <div
+        v-if="mobileMenuOpen"
+        class="lg:hidden mt-4 border-t border-gray-200 pt-4"
+      >
         <div class="flex flex-col gap-3">
-          <RouterLink to="/homepage/listJob" class="h-link font-sf-pro-display" active-class="active">
+          <RouterLink
+            to="/homepage/listJob"
+            class="h-link font-sf-pro-display"
+            active-class="active"
+          >
             Việc làm
           </RouterLink>
 
-          <RouterLink to="/homepage/saveJob" class="h-link font-sf-pro-display" active-class="active">
+          <RouterLink
+            to="/homepage/saveJob"
+            class="h-link font-sf-pro-display"
+            active-class="active"
+          >
             Việc làm đã lưu
           </RouterLink>
 
@@ -180,10 +223,18 @@
             Hồ sơ & CV
           </div>
 
-          <RouterLink class="h-link font-sf-pro-display" active-class="active" to="/about-us">
+          <RouterLink
+            class="h-link font-sf-pro-display"
+            active-class="active"
+            to="/about-us"
+          >
             Về chúng tôi
           </RouterLink>
-          <RouterLink class="h-link font-sf-pro-display" active-class="active" to="contact">
+          <RouterLink
+            class="h-link font-sf-pro-display"
+            active-class="active"
+            to="/contact"
+          >
             Liên hệ
           </RouterLink>
         </div>
@@ -202,8 +253,6 @@
 </template>
 
 <script setup>
-import rikkeiSvg from "@/assets/rikkei.svg";
-import jobsSvg from "@/assets/jobs.svg";
 import {
   DownOutlined,
   HeartOutlined,
@@ -257,26 +306,28 @@ const changeLanguage = (lang) => {
 const handleChange = () => {
   router.push("/");
 };
+const hasCv = () => store.getters.hasCv;
 const checkLogin = () => {
   if (!userLoginId.value) {
     message.error("Vui lòng đăng nhập để xem Hồ sơ & CV.");
     return;
   }
+  if (user.value?.role === "user" && !hasCv()) {
+    message.warning("Bạn cần tải CV lên để xem thông tin ứng viên.");
+    router.push("/profile/cv");
+    return;
+  }
   router.push(`/homepage/candidate/candidateDetail/${userLoginId.value}`);
 };
 const isModalVisible = ref(false);
-// Hiển thị modal khi nhấp vào "Đăng xuất"
 const showConfirm = () => {
   isModalVisible.value = true;
 };
 
-// Hàm xử lý đăng xuất
 const handleLogout = async () => {
-  // Server-side logout to clear HttpOnly cookies/session (best-effort)
   try {
     await logoutApi();
   } catch (e) {
-    // ignore; still clear local client state below
   } finally {
     localStorage.removeItem("token");
     router.push("/login");
@@ -284,25 +335,25 @@ const handleLogout = async () => {
   }
 };
 
-// Hàm xử lý khi hủy bỏ đăng xuất
 const handleCancel = () => {
   isModalVisible.value = false;
 };
-onMounted(() => {
+onMounted(async () => {
   if (userLoginId.value != null) {
-    store.dispatch("getUser", userLoginId.value);
+    await store.dispatch("getUser", userLoginId.value);
+    await store.dispatch("getCv");
   }
 });
 </script>
 <style scoped>
 .h-link {
-  @apply text-black no-underline transition-colors duration-300 ease-in-out;
+  @apply text-slate-700 no-underline transition-colors duration-300 ease-in-out;
 }
 .h-link:hover {
   @apply text-[rgba(171,31,36,1)];
 }
 .active {
-  @apply text-[rgba(171,31,36,1)] font-bold;
+  @apply text-[rgba(171,31,36,1)] font-semibold;
 }
 .font-sf-pro-display {
   font-family: "SF Pro Display", sans-serif;
@@ -315,5 +366,12 @@ onMounted(() => {
 }
 .image:hover {
   cursor: pointer;
+}
+.nav-pill {
+  padding: 8px 12px;
+  border-radius: 10px;
+}
+.nav-pill:hover {
+  background: rgba(255, 255, 255, 0.85);
 }
 </style>

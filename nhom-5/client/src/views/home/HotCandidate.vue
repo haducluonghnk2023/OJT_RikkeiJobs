@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-[rgba(250,250,250,1)] relative z-10">
+  <div v-if="canViewCandidates" class="bg-[rgba(250,250,250,1)] relative z-10">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
       <div class="absolute top-0 left-0 -z-10">
         <img :src="decorJobSvg" alt="" />
@@ -22,9 +22,10 @@
       <!-- Candidates Grid -->
       <div v-if="limitedCandidates.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div
-          v-for="candidate in limitedCandidates"
+          v-for="(candidate, index) in limitedCandidates"
           :key="candidate.id"
-          class="w-full p-4 gap-4 bg-[rgba(255,255,255,1)] rounded-lg shadow-md"
+          class="w-full p-4 gap-4 bg-[rgba(255,255,255,0.88)] backdrop-blur rounded-2xl shadow-md border border-white/70 lift-hover stagger-item"
+          :style="{ '--i': index }"
           @click="handleClick(candidate.id)"
           :class="{
             'cursor-not-allowed':
@@ -144,6 +145,7 @@
 import { computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
+import { message } from "ant-design-vue";
 import decorJobSvg from "@/assets/decorJob.svg";
 
 const router = useRouter();
@@ -154,6 +156,10 @@ const candidates = computed(() => store.state.candidate?.candidates || []);
 
 const handleClick = (id) => {
   if (!currentUser.value || String(currentUser.value?.status || "").toLowerCase() !== "active") {
+    return;
+  }
+  if (currentUser.value?.role === "user" && !store.getters.hasCv) {
+    message.warning("Bạn cần tải CV lên để xem chi tiết ứng viên.");
     return;
   }
   router.push(`/homepage/candidate/candidateDetail/${id}`);
@@ -183,6 +189,14 @@ const limitedCandidates = computed(() => {
 
 // current logged-in user comes from `user` module (set by Header.vue)
 const currentUser = computed(() => store.state.user?.userLogin || null);
+// Ẩn mục ứng viên với user chưa tải CV - chỉ được xem việc làm
+const canViewCandidates = computed(() => {
+  const u = currentUser.value;
+  if (!u) return true;
+  if (u.role === "admin" || u.role === "partner") return true;
+  if (u.role === "user") return store.getters.hasCv;
+  return true;
+});
 
 onMounted(() => {
   store.dispatch("getAllCandidates");

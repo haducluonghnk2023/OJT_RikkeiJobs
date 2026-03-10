@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
+import store from "@/store/store";
+import { message } from "ant-design-vue";
 
 const routes = [
   {
@@ -140,6 +142,16 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "AboutUs" */ "@/layout/AboutUs.vue"),
   },
+  {
+    path: "/contact",
+    name: "contact",
+    component: () =>
+      import(/* webpackChunkName: "Contact" */ "@/views/contact/ContactView.vue"),
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    redirect: "/",
+  },
 ];
 
 const router = createRouter({
@@ -154,6 +166,34 @@ const router = createRouter({
     }
     return { top: 0, left: 0 };
   },
+});
+
+// Chặn user (role user) chưa tải CV xem trang ứng viên - chỉ được xem việc làm
+router.beforeEach(async (to, from, next) => {
+  const isCandidateRoute =
+    to.path === "/homepage/candidate" ||
+    to.path.startsWith("/homepage/candidate/candidateDetail/");
+  if (!isCandidateRoute) return next();
+
+  const tokenRaw = localStorage.getItem("token");
+  const userId = tokenRaw ? JSON.parse(tokenRaw) : null;
+  if (!userId) return next();
+
+  const u = store.state.user?.userLogin;
+  if (!u) {
+    await store.dispatch("getUser", userId);
+  }
+  const user = store.state.user?.userLogin;
+  if (!user || user.role !== "user") return next();
+
+  if (!store.getters.hasCv) {
+    await store.dispatch("getCv");
+  }
+  if (!store.getters.hasCv) {
+    message.warning("Bạn cần tải CV lên để xem thông tin ứng viên.");
+    return next({ path: "/homepage/listJob", replace: true });
+  }
+  next();
 });
 
 export default router;

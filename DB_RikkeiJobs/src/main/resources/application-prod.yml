@@ -15,6 +15,7 @@ spring:
   jpa:
     show-sql: false
     hibernate:
+      # Khuyến nghị: dùng validate trên prod để tránh deadlock do DDL; quản lý schema bằng migration (Flyway/Liquibase).
       ddl-auto: update
     properties:
       hibernate:

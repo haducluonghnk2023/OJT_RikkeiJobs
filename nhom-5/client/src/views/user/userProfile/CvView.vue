@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-full h-full">
+  <div class="relative w-full h-full page-enter">
     <div ref="pageTopRef"></div>
     <div
       class="fixed inset-0 bg-gray-800 bg-opacity-50 z-10"
@@ -27,26 +27,26 @@
     </div> -->
 
     <!-- CV Display Area -->
-    <div class="bg-custom p-6 z-0">
+    <div class="p-6 z-0">
       <div class="max-w-[1200px] mx-auto">
-        <div class="flex justify-between">
+        <div class="surface-glass p-5 sm:p-6 flex justify-between">
           <div>
-            <h2 class="text-[18px] font-[600]">CV đã tải lên</h2>
-            <p class="font-[400] text-[16px] text-gray-700">
+            <h2 class="text-[20px] font-[700]">CV đã tải lên</h2>
+            <p class="font-[400] text-[14px] text-gray-600 mb-0">
               Hãy xem và cập nhật CV mới nhất của bạn
             </p>
           </div>
           <div>
             <button
               @click="isAddModalOpen = true"
-              class="bg-[#f8e9ea] gap-[4px] text-[#ab1f24] flex items-center justify-center border-0 w-[150px] h-[48px] font-[700] text-[16px] rounded-md"
+              class="gradient-btn gap-[4px] flex items-center justify-center border-0 w-[150px] h-[44px] font-[700] text-[14px] rounded-xl"
             >
               <UploadOutlined />Tải CV lên
             </button>
           </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-5 mb-[10px]">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 mb-[10px] mt-4">
           <div v-for="cv in paginatedCv" :key="cv.id" class="relative">
             <a-badge-ribbon
               :text="cv.status ? 'đạt yêu cầu ' : 'đang xử lý'"
@@ -54,7 +54,7 @@
               class="z-10"
             ></a-badge-ribbon>
 
-            <a-card class="bg-white rounded-lg relative shadow-md" hoverable>
+            <a-card class="bg-white/90 rounded-2xl relative shadow-md border border-white/80 lift-hover" hoverable>
               <template #cover>
                 <div
                   class="cv-cover-container bg-gradient-to-t from-[rgba(19,12,45,1)] to-[rgba(19,12,45,0)]"
@@ -117,7 +117,7 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, onMounted } from "vue";
+import { ref, computed, nextTick, onMounted, onBeforeUnmount, watch } from "vue";
 import { useStore } from "vuex";
 import EditCertificateModel from "@/components/userModal/EditCertificateModel.vue";
 import AddCvModal from "@/components/userModal/AddCvModal.vue";
@@ -149,6 +149,17 @@ const cancel = () => {
   isAddModalOpen.value = false;
   isEditModalOpen.value = false;
 };
+
+watch(
+  () => isAddModalOpen.value || isEditModalOpen.value,
+  (isOpen) => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+  }
+);
+
+onBeforeUnmount(() => {
+  document.body.style.overflow = "";
+});
 const showConfirm = (cv) => {
   Modal.confirm({
     title: `bạn có muốn xóa CV ${cv.pdf}`,
@@ -178,16 +189,24 @@ const handlePageChange = (page, pagesize) => {
 onMounted(async () => {
   const userId = JSON.parse(localStorage.getItem("token"));
   if (userId) {
-    await store.dispatch("getUser", userId);
-    await store.dispatch("getCv");
+    if (!store.getters.User || String(store.getters.User.id) !== String(userId)) {
+      await store.dispatch("getUser", userId);
+    }
+    if (!Array.isArray(store.getters.Cv) || store.getters.Cv.length === 0) {
+      await store.dispatch("getCv");
+    }
   }
 });
 </script>
 <style scoped>
 .custom-btn {
-  padding: 0 0.5rem;
+  padding: 2px 10px;
   border-radius: 1rem;
-  border: 1px solid;
+  border: 1px solid #d1d5db;
+  transition: border-color 0.2s ease;
+}
+.custom-btn:hover {
+  border-color: #ab1f24;
 }
 .cv-cover-container {
   position: relative;

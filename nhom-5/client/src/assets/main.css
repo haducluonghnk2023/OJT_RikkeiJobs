@@ -2,3 +2,229 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --app-bg: #f5f7ff;
+  --surface: rgba(255, 255, 255, 0.75);
+  --surface-solid: #ffffff;
+  --text-main: #141a2a;
+  --text-muted: #667085;
+  --primary: #ab1f24;
+  --primary-soft: #fdecee;
+  --accent: #6b7bff;
+  --radius-xl: 18px;
+  --radius-md: 12px;
+  --shadow-soft: 0 16px 40px rgba(16, 24, 40, 0.08);
+  --shadow-hover: 0 24px 50px rgba(16, 24, 40, 0.14);
+  --duration-fast: 220ms;
+  --duration-base: 320ms;
+}
+
+body {
+  background: radial-gradient(circle at 10% 10%, #eef2ff 0%, transparent 30%),
+    radial-gradient(circle at 90% 20%, #ffeef2 0%, transparent 32%),
+    var(--app-bg);
+  color: var(--text-main);
+}
+
+::selection {
+  background: rgba(171, 31, 36, 0.18);
+}
+
+.surface-glass {
+  background: var(--surface);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: var(--shadow-soft);
+  border-radius: var(--radius-xl);
+}
+
+.lift-hover {
+  transition: transform var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
+}
+
+.lift-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+.page-enter {
+  animation: pageReveal 120ms linear both;
+}
+
+.route-enter-active,
+.route-leave-active {
+  transition: opacity 100ms linear;
+}
+
+.route-enter-from,
+.route-leave-to {
+  opacity: 0;
+}
+
+.gradient-btn {
+  background: linear-gradient(135deg, #ab1f24, #d13037);
+  color: #fff;
+  transition: transform var(--duration-fast) ease, filter var(--duration-fast) ease;
+}
+
+.gradient-btn:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.stagger-item {
+  animation: itemReveal 420ms ease both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.6s infinite;
+}
+
+.ant-message .ant-message-notice-content {
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-soft);
+}
+
+.ant-spin-dot-item {
+  background-color: var(--primary);
+}
+
+.empty-state-card {
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: var(--shadow-soft);
+}
+
+.favorite-heart-btn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  border: 1px solid rgba(221, 221, 221, 1);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease,
+    background-color 0.22s ease, color 0.22s ease;
+}
+
+.favorite-heart-btn svg {
+  transition: transform 0.22s ease, color 0.22s ease;
+}
+
+.favorite-heart-btn:hover {
+  transform: translateY(-1px);
+  color: #ef4444;
+  background: #fff1f2;
+  border-color: #fecaca;
+  box-shadow: 0 10px 20px rgba(239, 68, 68, 0.14);
+}
+
+.favorite-heart-btn:hover svg {
+  transform: scale(1.12);
+  color: #ef4444;
+}
+
+.favorite-heart-btn:active {
+  transform: scale(0.94);
+}
+
+.favorite-heart-btn--active {
+  color: #ef4444;
+  background: #fef2f2;
+  border-color: #fecaca;
+  animation: heartPop 260ms ease;
+}
+
+.favorite-heart-btn--idle {
+  color: #9ca3af;
+}
+
+.favorite-heart-btn--idle:hover {
+  color: #ef4444;
+}
+
+.favorite-heart-btn--idle:hover svg {
+  color: #ef4444;
+}
+
+@keyframes pageReveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes itemReveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes heartPop {
+  0% {
+    transform: scale(0.9);
+  }
+  55% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .lift-hover:hover {
+    transform: none;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .favorite-heart-btn:hover,
+  .favorite-heart-btn:active {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .favorite-heart-btn--active {
+    animation: none;
+  }
+}

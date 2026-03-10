@@ -2,24 +2,24 @@
   <div>
     <footer>
       <div
-        class="footer-background flex flex-col gap-6 bg-red-800 text-white px-4 sm:px-6 lg:px-8 py-10 lg:py-16"
+        class="footer-background flex flex-col gap-4 bg-red-800 text-white px-4 sm:px-6 lg:px-8 py-8 lg:py-10"
       >
         <div class="mx-auto w-full max-w-7xl">
-          <div class="flex flex-col items-start gap-3 border-b border-white pb-4">
-            <img class="w-48 h-auto" :src="logo2Url" alt="" />
-          <p class="font-normal text-xl">
+          <div class="flex flex-col items-start gap-2 border-b border-white/70 pb-3">
+            <img class="w-44 h-auto" :src="logo2Url" alt="" />
+          <p class="font-normal text-lg">
             KHƠI DẬY TIỀM LỰC - MỞ LỐI THÀNH CÔNG
           </p>
         </div>
 
-          <div class="flex flex-col lg:flex-row gap-10 lg:gap-20 border-b border-white pb-6 pt-6">
+          <div class="flex flex-col lg:flex-row gap-6 lg:gap-14 border-b border-white/70 pb-4 pt-4">
             <div class="flex flex-col gap-1">
-              <p class="font-medium text-lg">THÔNG TIN LIÊN HỆ</p>
-              <ul class="space-y-3">
+              <p class="font-medium text-base">THÔNG TIN LIÊN HỆ</p>
+              <ul class="space-y-2">
                 <li class="flex items-start gap-2">
                   <img :src="iconFeatured1" alt="" />
                   <div class="min-w-0">
-                    <span class="font-semibold text-base">Trụ sở Hà Nội:</span>
+                    <span class="font-semibold text-sm">Trụ sở Hà Nội:</span>
                     <div class="text-sm font-normal">
                       Tầng 7, Tháp A, Tòa Sông Đà, Đường Phạm Hùng, Mỹ Đình, Nam Từ
                       Liêm, Hà Nội
@@ -28,20 +28,20 @@
                 </li>
                 <li class="flex items-center gap-2">
                   <img :src="iconFeatured2" alt="" />
-                  <span class="font-semibold text-base">Hotline:</span>
+                  <span class="font-semibold text-sm">Hotline:</span>
                   <span class="text-sm font-normal">0862 069 233</span>
                 </li>
                 <li class="flex items-center gap-2">
                   <img :src="iconFeatured3" alt="" />
-                  <span class="font-semibold text-base">Email:</span>
+                  <span class="font-semibold text-sm">Email:</span>
                   <span class="text-sm font-normal break-all">academy@rikkeisoft.com</span>
                 </li>
               </ul>
             </div>
 
             <div class="flex flex-col gap-1">
-              <p class="text-[16px] text-white font-bold">Khóa học</p>
-              <ul class="space-y-3 font-semibold text-base">
+              <p class="text-[15px] text-white font-bold">Khóa học</p>
+              <ul class="space-y-2 font-semibold text-base">
                 <li class="text-[16px] font-extralight text-white">
                   Cho người mới bắt đầu
                 </li>
@@ -61,15 +61,15 @@
             </div>
 
             <div class="flex flex-col gap-1">
-              <p class="font-medium text-lg">Theo dõi chúng tôi tại</p>
-              <div class="flex gap-5">
+              <p class="font-medium text-base">Theo dõi chúng tôi tại</p>
+              <div class="flex gap-4">
                 <img :src="iconFacebook" alt="" />
                 <img :src="iconYoutube" alt="" />
               </div>
             </div>
           </div>
 
-          <div class="flex flex-col lg:flex-row flex-wrap gap-8 lg:gap-10 pt-6">
+          <div class="flex flex-col lg:flex-row flex-wrap gap-5 lg:gap-8 pt-4">
             <div class="flex flex-col gap-1">
               <p class="font-semibold text-base">Cơ sở 1</p>
               <ul class="space-y-2">
@@ -134,7 +134,7 @@
             </div>
           </div>
 
-          <div class="pt-6 border-t border-white/30">
+          <div class="pt-4 border-t border-white/30">
             <p class="text-xs font-normal">
               @2024 By Rikkei Academy - Rikkei Education - All rights reserved.
             </p>

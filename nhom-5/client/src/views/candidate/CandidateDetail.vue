@@ -1,102 +1,75 @@
 <template>
-  <div>
-    <div class="" v-if="isOpen">
+  <div class="page-enter min-h-screen">
+    <div v-if="isOpen">
       <BookingModel @cancel="cancel" />
     </div>
-    <Header class="mb-[50px]" />
-    <div class="flex ml-[110px] justify-between">
-      <div class="flex w-[500px] gap-[20px]">
-        <div class="img">
-          <img
-            class="w-[180px] h-[200px] rounded-md object-cover"
-            :src="candidate?.avatar"
-            alt=""
-          />
-        </div>
-        <div>
-          <div class="gap-[16px]">
+    <Header class="mb-8" />
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section class="surface-glass p-5 sm:p-7 lift-hover">
+        <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+          <div class="flex gap-5">
+            <img
+              class="w-[140px] h-[160px] sm:w-[170px] sm:h-[190px] rounded-2xl object-cover shadow-md"
+              :src="candidate?.avatar"
+              alt=""
+            />
             <div>
-              <p class="name1 w-[300px] h-[40px] font-bold">
+              <p class="text-2xl sm:text-3xl font-bold text-slate-900">
                 {{ candidate?.fullName }}
               </p>
-              <!-- Bind candidate's name -->
-            </div>
-            <div class="flex gap-[12px]">
-              <p class="text-item">
-                {{ calculateAge(candidate?.birthdate) }} tuổi
-              </p>
-              <!-- Bind candidate's age -->
-              <p class="location min-w-[70px] justify-center flex">
-                {{ candidate?.position }}
-              </p>
+              <div class="flex flex-wrap items-center gap-2 mt-2">
+                <span class="text-slate-500 text-sm sm:text-base">
+                  {{ calculateAge(candidate?.birthdate) }} tuổi
+                </span>
+                <span class="px-3 py-1 rounded-full text-sm bg-[var(--primary-soft)] text-[var(--primary)] font-semibold">
+                  {{ candidate?.position }}
+                </span>
+              </div>
+
+              <div class="mt-4 space-y-2 text-[15px]">
+                <div class="flex items-center gap-2">
+                  <font-awesome-icon :icon="['fas', 'graduation-cap']" class="text-[var(--primary)]" />
+                  <span class="font-semibold text-slate-800">Trình độ:</span>
+                  <span class="text-slate-600">{{ candidate?.level }}</span>
+                </div>
+                <div class="flex items-start gap-2">
+                  <font-awesome-icon :icon="['fas', 'language']" class="text-[var(--primary)] mt-1" />
+                  <span class="font-semibold text-slate-800 min-w-[78px]">Ngoại ngữ:</span>
+                  <span class="text-slate-600">
+                    <template v-for="(edu, index) in candidate?.foreignLanguage" :key="index">
+                      {{ edu }}<span v-if="index < candidate?.foreignLanguage.length - 1">, </span>
+                    </template>
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
-          <div>
-            <div class="flex gap-4">
-              <p>
-                <font-awesome-icon
-                  :icon="['fas', 'graduation-cap']"
-                  class="icon"
-                />
-              </p>
-              <p class="text font-bold">Trình độ :</p>
-              <p class="text-item">{{ candidate?.level }}</p>
-              <!-- Bind candidate's degree -->
-            </div>
-            <div class="flex gap-4">
-              <p>
-                <font-awesome-icon :icon="['fas', 'language']" class="icon" />
-              </p>
-              <div class="text font-bold w-[90px]">Ngoại ngữ :</div>
-              <span
-                v-for="(edu, index) in candidate?.foreignLanguage"
-                :key="index"
-              >
-                {{ edu
-                }}<span
-                  class="m-0 p-0"
-                  v-if="index < candidate?.foreignLanguage.length - 1"
-                  >,
-                </span>
-              </span>
-              <!-- Bind candidate's language -->
-            </div>
+
+          <div v-if="isAllowedToViewCVP">
+            <button @click="openModal" class="gradient-btn px-5 h-11 rounded-xl font-semibold shadow-md">
+              Hẹn lịch phỏng vấn
+            </button>
           </div>
         </div>
-      </div>
-      <div v-if="isAllowedToViewCVP">
-        <button @click="openModal" class="btn w-[170px] h-[40px] mr-[110px]">
-          Hẹn lịch phỏng vấn
-        </button>
-      </div>
-    </div>
-    <div class="mt-10 mb-10 flex justify-center">
-      <hr class="w-[85.5%]" />
-    </div>
-    <div class="ml-[110px]" v-if="isAllowedToViewCV">
-      <div class="flex gap-[12px]">
-        <p>
-          <font-awesome-icon
-            :icon="['fas', 'book']"
-            class="text-[rgba(188,34,40,1)]"
-          />
-        </p>
-        <p class="cv font-bold">Danh sách CV</p>
-        <!-- khung cv -->
-      </div>
-      <div>
-        <div class="grid grid-cols-4 gap-4 mb-[20px] mr-[80px]">
+      </section>
+
+      <section class="mt-8" v-if="isAllowedToViewCV">
+        <div class="flex items-center gap-2 mb-4">
+          <font-awesome-icon :icon="['fas', 'book']" class="text-[var(--primary)]" />
+          <p class="text-lg sm:text-xl font-bold text-slate-800">Danh sách CV</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <a-card
             v-for="cv in filteredCvs"
             :key="cv.id"
-            class="bg-white rounded-lg shadow-md"
+            class="rounded-2xl overflow-hidden lift-hover"
             hoverable
-            style="width: 280px; position: relative; right: 0"
+            style="width: 100%"
           >
             <template #cover>
-              <div
-                class="cv-cover-container bg-gradient-to-t from-[rgba(19,12,45,1)] to-[rgba(19,12,45,0)]"
-              >
+              <div class="cv-cover-container bg-gradient-to-t from-[rgba(19,12,45,1)] to-[rgba(19,12,45,0)]">
                 <img
                   class="cv-cover-image"
                   alt="example"
@@ -114,30 +87,21 @@
             </template>
             <template #actions>
               <button class="custom-btn">
-                <a
-                  :href="cv.pdfDataUrl"
-                  target="blank"
-                  style="
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    gap: 5px;
-                    color: black;
-                  "
-                >
+                <a :href="cv.pdfDataUrl" target="blank" class="flex justify-center items-center gap-1 text-slate-800 hover:text-[var(--primary)]">
                   <font-awesome-icon :icon="['fas', 'eye']" />
-                  Xem</a
-                >
+                  Xem
+                </a>
               </button>
-              <div v-if="cv.status === false" class="text-red-500 mt-0">
+              <div v-if="cv.status === false" class="text-red-500 mt-0 text-sm">
                 Đang chờ xét duyệt
               </div>
             </template>
           </a-card>
         </div>
-      </div>
-    </div>
-    <Footer />
+      </section>
+    </main>
+
+    <Footer class="mt-10" />
   </div>
 </template>
 
@@ -154,7 +118,6 @@ const cancel = () => {
 const store = useStore();
 const route = useRoute();
 const userId = route.params.id;
-const users = computed(() => store.state.auth?.users || []);
 const isOpen = ref(false);
 const loggedUser = computed(() => {
   const tokenRaw = localStorage.getItem("token");
@@ -201,8 +164,6 @@ const filteredCvs = computed(() => {
     // console.log(loggedUser.value?.id == userId);
     if (loggedUser.value?.id == userId) {
       // Nếu người dùng hiện tại là người dùng đang đăng nhập, hiển thị tất cả CV của người đó
-      console.log(cv.value);
-
       return cv.value.filter((item) => item.userId == userId);
     } else {
       // Nếu không phải người dùng đăng nhập, chỉ hiển thị CV có status là true
@@ -232,43 +193,17 @@ const openModal = () => {
 </script>
 
 <style scoped>
-.btn {
-  color: rgba(255, 255, 255, 1);
-  background: rgba(171, 31, 36, 1);
-  border-radius: 8px;
+.custom-btn {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid #e2e8f0;
+  transition: border-color 220ms ease;
 }
-.img {
-  border-radius: 8px;
+
+.custom-btn:hover {
+  border-color: var(--primary);
 }
-.name1 {
-  font-family: "SF Pro Displays", sans-serif;
-  font-size: 32px;
-  line-height: 40px;
-  color: rgba(0, 0, 0, 1);
-}
-.icon {
-  color: rgba(188, 34, 40, 1);
-}
-.text {
-  color: rgba(45, 44, 44, 1);
-  font-size: 16px;
-  font-family: "SF Pro Displays", sans-serif;
-}
-.text-item {
-  color: rgba(103, 103, 103, 1);
-  font-family: "SF Pro Displays", sans-serif;
-  font-size: 16px;
-}
-.location {
-  background-color: rgba(254, 243, 242, 1);
-  border-radius: 11px;
-  color: rgba(180, 35, 24, 1);
-}
-.cv {
-  font-family: "SF Pro Displays", sans-serif;
-  color: rgba(45, 44, 44, 1);
-  font-size: 18px;
-}
+
 .cv-cover-container {
   position: relative;
   height: 200px;

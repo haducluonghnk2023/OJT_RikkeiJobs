@@ -1,7 +1,10 @@
 <template>
-  <div>
-    <Header class="mb-[40px]" />
-    <div class="flex w-[550px] h-[28px] gap-[8px] ml-[160px] mb-[40px]">
+  <div class="page-enter min-h-screen relative overflow-hidden">
+    <div class="pointer-events-none absolute -top-20 -left-24 w-72 h-72 rounded-full blur-3xl bg-[#c9d4ff]/40"></div>
+    <div class="pointer-events-none absolute top-24 -right-24 w-72 h-72 rounded-full blur-3xl bg-[#ffd2d7]/40"></div>
+    <Header class="mb-6" />
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-wrap w-full text-sm gap-2 mb-8">
       <router-link
         to="/homepage"
         class="text-[rgba(167,167,167,1)] flex justify-center w-[75px] h-[28px]"
@@ -31,10 +34,10 @@
         {{ job?.title }}
       </p>
     </div>
-    <div class="flex gap-[4px]">
-      <div>
+    <div class="flex flex-col xl:flex-row gap-6">
+      <div class="xl:w-[792px] w-full">
         <div
-          class="w-[792px] h-[140px] flex justify-between border-2 border-[rgba(221,221,221,1)] ml-[160px] rounded-md p-[24px]"
+          class="w-full min-h-[140px] flex justify-between border border-white/70 bg-white/85 backdrop-blur rounded-2xl p-6 shadow-sm"
         >
           <div class="w-[379px] h-[88px] flex gap-[16px]">
             <img class="w-[88px] h-[88px] rounded-sm" :src="job?.image" />
@@ -100,7 +103,7 @@
             </p>
             <p
               v-else
-              class="w-[165px] h-[40px] bg-[rgba(171,31,36,1)] gap-[8px] text-[rgba(255,255,255,1)] rounded-md justify-center items-center flex"
+              class="w-[165px] h-[40px] gradient-btn gap-[8px] rounded-md justify-center items-center flex"
               @click="applyForJob"
             >
               <font-awesome-icon :icon="['fas', 'paper-plane']" />
@@ -109,20 +112,20 @@
             <p
               @click="toggleFavorite(job?.id)"
               class="w-[165px] h-[40px] bg-[rgba(255,255,255,1)] border-2 gap-[8px] rounded-md justify-center items-center flex hover:cursor-pointer transition-colors"
-              :class="isFavoriteJob ? 'border-red-400 text-red-600 bg-red-50' : 'border-[rgba(103,103,103,1)] text-[rgba(103,103,103,1)]'"
+              :class="isFavoriteJob ? 'text-red-500 bg-red-50 border-red-200' : 'border-[rgba(221,221,221,1)] text-gray-600'"
             >
-              <font-awesome-icon :icon="['fas', 'heart']" :class="isFavoriteJob ? 'text-red-600' : ''" />
+              <font-awesome-icon :icon="['fas', 'heart']" :class="isFavoriteJob ? 'text-red-500' : 'text-[rgba(221,221,221,1)]'" />
               {{ isFavoriteJob ? 'Đã lưu' : 'Lưu tin' }}
             </p>
           </div>
         </div>
         <div
-          class="w-[190px] h-[36px] text-[rgba(17,17,17,1)] text-[18px] ml-[160px] font-bold border-l-4 flex justify-center items-center border-[rgba(188,34,40,1)] mt-7"
+          class="w-[190px] h-[36px] text-[rgba(17,17,17,1)] text-[18px] font-bold border-l-4 flex justify-center items-center border-[rgba(188,34,40,1)] mt-7"
         >
           Chi tiết tuyển dụng
         </div>
         <div
-          class="w-[792px] h-[284px] mt-7 p-[24px] bg-[rgba(255,246,247,1)] ml-[160px] rounded-lg flex flex-col border-2 mb-[50px]"
+          class="w-full mt-7 p-[24px] bg-[rgba(255,246,247,1)] rounded-2xl flex flex-col border border-white/70 mb-[50px]"
         >
           <div
             class="w-[118px] h-[24px] text-[rgba(17,17,17,1)] text-[16px] font-bold"
@@ -212,7 +215,7 @@
                   <p
                     class="w-[112px] h-[24px] ml-0 text-[rgba(17,17,17,1)] text-[16px] font-bold mb-0"
                   >
-                    {{ job?.quantity }} người
+                    {{ quantityLabel }}
                   </p>
                 </div>
               </div>
@@ -233,7 +236,7 @@
                   <p
                     class="w-[112px] h-[24px] ml-0 text-[rgba(17,17,17,1)] text-[16px] font-bold mb-0"
                   >
-                    {{ job?.skills }}
+                    {{ displayRank }}
                   </p>
                 </div>
               </div>
@@ -255,14 +258,14 @@
                   <p
                     class="w-[115px] h-[24px] ml-0 text-[rgba(17,17,17,1)] text-[16px] font-bold mb-0"
                   >
-                    {{ jobRankDuration }}
+                    {{ experienceLabel }}
                   </p>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="w-[792px] ml-[160px] gap-[12px]">
+        <div class="w-full gap-[12px]">
           <p class="text-[16px] text-[rgba(17,17,17,1)] font-bold">
             Mô tả công việc
           </p>
@@ -277,7 +280,7 @@
           </div>
         </div>
 
-        <div class="w-[792px] ml-[160px] gap-[12px] mt-[40px]">
+        <div class="w-full gap-[12px] mt-[40px]">
           <p class="text-[16px] text-[rgba(17,17,17,1)] font-bold">
             Yêu cầu ứng viên
           </p>
@@ -292,7 +295,7 @@
           </div>
         </div>
 
-        <div class="w-[792px] ml-[160px] gap-[12px] mt-[40px] mb-[40px]">
+        <div class="w-full gap-[12px] mt-[40px] mb-[40px]">
           <p class="text-[16px] text-[rgba(17,17,17,1)] font-bold">Quyền lợi</p>
           <div class="ml-2">
             <ul
@@ -305,19 +308,19 @@
           </div>
         </div>
 
-        <div class="w-[792px] h-[60px] ml-[160px] mb-[30px]">
+        <div class="w-full h-[60px] mb-[30px]">
           <p class="text-[rgba(17,17,17,1)] font-bold">Địa điểm làm việc</p>
           <li class="text-[rgba(45,44,44,1)] text-[16px]">
             {{ job?.province }}: {{ job?.district }}
           </li>
         </div>
-        <div class="w-[792px] h-[60px] ml-[160px] mb-[30px]">
+        <div class="w-full h-[60px] mb-[30px]">
           <p class="text-[rgba(17,17,17,1)] font-bold">Thời gian làm việc</p>
           <li class="text-[rgba(45,44,44,1)] text-[16px]">
             {{ job?.workingTime }}
           </li>
         </div>
-        <div class="w-[792px] h-[60px] ml-[160px] mb-[50px]">
+        <div class="w-full h-[60px] mb-[50px]">
           <p class="text-[rgba(17,17,17,1)] font-bold">Cách thức ứng tuyển</p>
           <li class="text-[rgba(45,44,44,1)] text-[16px]">
             Ứng viên nộp hồ sơ trực tuyến bằng cách bấm
@@ -331,7 +334,7 @@
           </li>
         </div>
 
-        <div class="w-[346px] h-[40px] flex gap-[16px] ml-[160px] mb-[50px]">
+        <div class="w-[346px] h-[40px] flex gap-[16px] mb-[50px]">
           <p
             v-if="hasApplied"
             class="w-[165px] h-[40px] bg-[#1e6d2a] gap-[8px] text-[rgba(255,255,255,1)] rounded-md justify-center items-center flex"
@@ -341,7 +344,7 @@
           </p>
           <p
             v-else
-            class="w-[165px] hover:cursor-pointer h-[40px] bg-[rgba(171,31,36,1)] gap-[8px] text-[rgba(255,255,255,1)] rounded-md justify-center items-center flex"
+            class="w-[165px] hover:cursor-pointer h-[40px] gradient-btn gap-[8px] rounded-md justify-center items-center flex"
             @click="applyForJob"
           >
             <font-awesome-icon :icon="['fas', 'paper-plane']" />
@@ -350,26 +353,33 @@
           <p
             @click="toggleFavorite(job?.id)"
             class="w-[165px] h-[40px] hover:cursor-pointer bg-[rgba(255,255,255,1)] border-2 gap-[8px] rounded-md justify-center items-center flex transition-colors"
-            :class="isFavoriteJob ? 'border-red-400 text-red-600 bg-red-50' : 'border-[rgba(103,103,103,1)] text-[rgba(103,103,103,1)]'"
+            :class="isFavoriteJob ? 'text-red-500 bg-red-50 border-red-200' : 'border-[rgba(221,221,221,1)] text-gray-600'"
           >
-            <font-awesome-icon :icon="['fas', 'heart']" :class="isFavoriteJob ? 'text-red-600' : ''" />
+            <font-awesome-icon :icon="['fas', 'heart']" :class="isFavoriteJob ? 'text-red-500' : 'text-[rgba(221,221,221,1)]'" />
             {{ isFavoriteJob ? 'Đã lưu' : 'Lưu tin' }}
           </p>
         </div>
       </div>
-      <div class="flex gap-5 flex-col">
+      <div class="flex gap-5 flex-col xl:w-[410px] w-full">
         <div
-          class="w-[164px] h-[30px] ml-4 text-[20px] text-[rgba(0,0,0,1)] font-bold flex"
+          class="w-[164px] h-[30px] text-[20px] text-[rgba(0,0,0,1)] font-bold flex"
         >
           Việc làm liên quan
         </div>
         <div
+          v-if="filteredRelatedJobs.length === 0"
+          class="empty-state-card p-5 text-sm text-slate-500"
+        >
+          Chưa có việc làm liên quan phù hợp.
+        </div>
+        <div
           v-for="(job, index) in filteredRelatedJobs"
           :key="index"
-          class="w-[410px] h-[186px] mb-[30px] p-4"
+          class="w-full h-[186px] mb-[30px] p-0 stagger-item"
+          :style="{ '--i': index }"
         >
           <div
-            class="bg-white rounded-lg shadow-md border border-gray-200 p-5 hover:shadow-lg transition-shadow relative"
+            class="bg-white/85 backdrop-blur rounded-2xl shadow-md border border-white/70 p-5 hover:shadow-lg transition-all duration-300 relative"
           >
             <div class="flex gap-5">
               <!-- Job Image -->
@@ -463,16 +473,17 @@
             <button
               type="button"
               @click.stop="toggleFavorite(job.id)"
-              class="absolute top-4 right-4 flex justify-center items-center transition-colors"
-              :class="isFavorite(job.id) ? 'text-red-500' : 'text-gray-400 hover:text-gray-600'"
+              class="absolute top-4 right-4 favorite-heart-btn"
+              :class="isFavorite(job.id) ? 'favorite-heart-btn--active' : 'favorite-heart-btn--idle'"
             >
-              <font-awesome-icon :icon="['fas', 'heart']" :class="isFavorite(job.id) ? 'text-red-500' : ''" class="text-lg" />
+              <font-awesome-icon :icon="['fas', 'heart']" :class="isFavorite(job.id) ? 'text-red-500' : 'text-[rgba(221,221,221,1)]'" class="text-lg" />
             </button>
 
             <!-- Badge Icon (optional if needed) -->
           </div>
         </div>
       </div>
+    </div>
     </div>
     <Footer />
   </div>
@@ -511,28 +522,40 @@ const loggedUser = computed(() => {
   return users.find((u) => u.id == storedUserId) || null;
 });
 
-const jobRankDuration = computed(() => {
-  if (job.value && job.value.skills) {
-    // Xử lý trường hợp skills là một chuỗi
-    let skill = job.value.skills;
-    // console.log(skill);
-
-    switch (skill) {
-      case "Mới tốt nghiệp":
-        return "1 năm";
-      case "Sơ cấp":
-        return "1 năm";
-      case "Trung cấp":
-        return "2 năm";
-      case "Cao cấp":
-        return "3 năm";
-      case "Lead":
-        return "5 năm";
-      default:
-        return "Không xác định";
-    }
+const normalizedRanks = computed(() => {
+  const rank = job.value?.rank;
+  if (Array.isArray(rank)) return rank.filter(Boolean);
+  if (typeof rank === "string" && rank.trim()) {
+    return rank
+      .split(",")
+      .map((r) => r.trim())
+      .filter(Boolean);
   }
-  return "Không có dữ liệu công việc";
+  return [];
+});
+
+const displayRank = computed(() => {
+  if (normalizedRanks.value.length > 0) return normalizedRanks.value.join(", ");
+  return job.value?.skills || "Không xác định";
+});
+
+const experienceLabel = computed(() => {
+  const ranks = normalizedRanks.value.map((r) => r.toLowerCase());
+  if (ranks.some((r) => r.includes("lead"))) return "5 năm+";
+  if (ranks.some((r) => r.includes("senior") || r.includes("cao cấp"))) return "3 năm+";
+  if (ranks.some((r) => r.includes("middle") || r.includes("trung cấp"))) return "2 năm+";
+  if (ranks.some((r) => r.includes("junior") || r.includes("sơ cấp"))) return "1 năm+";
+  if (ranks.some((r) => r.includes("fresher") || r.includes("mới tốt nghiệp"))) return "Dưới 1 năm";
+  return "Không xác định";
+});
+
+const quantityLabel = computed(() => {
+  const quantity = job.value?.quantity;
+  if (quantity === null || quantity === undefined || quantity === "") {
+    return "Không xác định";
+  }
+  const raw = String(quantity).trim();
+  return /người/i.test(raw) ? raw : `${raw} người`;
 });
 
 const calculateTimeAgo = (updateDate) => {
@@ -562,43 +585,49 @@ const calculateDaysLeft = (deadline, updateDate) => {
   return diffDays >= 0 ? diffDays : 0; // Đảm bảo không có giá trị âm
 };
 const jobsWithDaysLeft = computed(() => {
-  const result = {}; // Khởi tạo đối tượng rỗng
+  const result = {};
 
-  jobs.value.forEach((job) => {
-    const daysLeft = calculateDaysLeft(job.deadline, job.updateDate); // Tính số ngày còn lại
-    const timeAgo = calculateTimeAgo(job.updateDate);
-
-    // Gán đối tượng job với key là job.id
-    result[job.id] = { ...job, daysLeft, timeAgo };
+  jobs.value.forEach((item) => {
+    const daysLeft = calculateDaysLeft(item.deadline, item.updateDate);
+    const timeAgo = calculateTimeAgo(item.updateDate);
+    result[item.id] = { ...item, daysLeft, timeAgo };
   });
-  // console.log(result);
-
-  // Nếu có job hiện tại, thêm logic lọc công việc liên quan
-  if (job.value) {
-    const related = Object.values(result)
-      .filter(
-        (j) => j.industry === job.value.industry && j.id !== job.value.id // Loại bỏ chính công việc hiện tại
-      )
-      .slice(0, 3); // Lấy tối đa 3 công việc liên quan
-    // console.log(related, "11111");
-
-    // Thêm trường `isRelated` vào các công việc liên quan
-    related.forEach((relatedJob) => {
-      if (result[relatedJob.id]) {
-        result[relatedJob.id].isRelated = true; // Đánh dấu các công việc liên quan
-      }
-    });
-
-    // Loại bỏ công việc hiện tại khỏi `result`
-    delete result[job.value.id];
-    // console.log(result);
-  }
 
   return result;
 });
 
+const normalizeText = (value) =>
+  (value ?? "")
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+
 const filteredRelatedJobs = computed(() => {
-  return Object.values(jobsWithDaysLeft.value).filter((job) => job.isRelated);
+  if (!job.value) return [];
+
+  const currentId = String(job.value.id);
+  const currentIndustry = normalizeText(job.value.industry);
+  const currentPosition = normalizeText(job.value.position);
+
+  const pool = Object.values(jobsWithDaysLeft.value).filter(
+    (item) => String(item.id) !== currentId
+  );
+
+  // Ưu tiên cùng industry (đã normalize)
+  const byIndustry = currentIndustry
+    ? pool.filter((item) => normalizeText(item.industry) === currentIndustry)
+    : [];
+  if (byIndustry.length > 0) return byIndustry.slice(0, 3);
+
+  // Fallback theo position nếu industry trống/không khớp
+  const byPosition = currentPosition
+    ? pool.filter((item) => normalizeText(item.position) === currentPosition)
+    : [];
+  if (byPosition.length > 0) return byPosition.slice(0, 3);
+
+  // Fallback cuối: lấy 3 job mới nhất còn lại
+  return pool.slice(0, 3);
 });
 watch(
   () => route.params.id,

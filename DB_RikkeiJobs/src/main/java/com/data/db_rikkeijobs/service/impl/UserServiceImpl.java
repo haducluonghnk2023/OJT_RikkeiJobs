@@ -46,9 +46,9 @@ public class UserServiceImpl implements UserService {
         if (user.getPassword() != null) {
             String password = user.getPassword();
             boolean isEncoded = password.startsWith("$2") && password.length() >= 59 && password.length() <= 60;
-            if (!isEncoded) {
-                user.setPassword(passwordEncoder.encode(password));
-            }
+            String encoded = isEncoded ? password : passwordEncoder.encode(password);
+            user.setPassword(encoded);
+            user.setPasswordHash(encoded); // DB có cả 2 cột NOT NULL
         }
         return userRepository.save(user);
     }
@@ -63,7 +63,13 @@ public class UserServiceImpl implements UserService {
             userToUpdate.setEmail(user.getEmail());
             userToUpdate.setUserName(user.getUserName());
             userToUpdate.setFullName(user.getFullName());
-            userToUpdate.setPassword(user.getPassword());
+            String pwd = user.getPassword();
+            if (pwd != null) {
+                boolean isEncoded = pwd.startsWith("$2") && pwd.length() >= 59 && pwd.length() <= 60;
+                String encoded = isEncoded ? pwd : passwordEncoder.encode(pwd);
+                userToUpdate.setPassword(encoded);
+                userToUpdate.setPasswordHash(encoded);
+            }
             userToUpdate.setStatus(user.getStatus());
             userToUpdate.setAddress(user.getAddress());
             userToUpdate.setPhone(user.getPhone());

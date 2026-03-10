@@ -6,6 +6,8 @@ spring:
   jpa:
     show-sql: false
     hibernate:
+      # update = Hibernate tự ALTER schema → dễ deadlock nếu nhiều connection/instance.
+      # Sau khi đã chạy fix_cvs_pdf_data_url.sql (hoặc schema đã đúng), có thể đổi thành validate.
       ddl-auto: update
     properties:
       hibernate:

@@ -18,6 +18,8 @@ const user = {
     Certificate: (state) => state.certificate,
     Cv: (state) => state.cv,
     Interview: (state) => state.interview,
+    /** User có ít nhất 1 CV đã tải lên - dùng để chặn xem chi tiết ứng viên khi chưa up CV */
+    hasCv: (state) => Array.isArray(state.cv) && state.cv.length > 0,
   },
   mutations: {
     SET_USER(state, user) {

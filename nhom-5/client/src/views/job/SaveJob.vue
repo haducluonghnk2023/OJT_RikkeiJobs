@@ -27,13 +27,13 @@
           :key="job?.id ?? index"
           class="bg-white w-full min-w-0 rounded-lg shadow-md border border-gray-200 p-4 sm:p-5 hover:shadow-lg transition-shadow relative overflow-hidden"
         >
-          <div class="flex gap-5">
+          <div class="flex items-start gap-4">
             <img
               :src="job.image"
               alt="Job"
               class="rounded-md object-cover mb-4 w-20 h-20 shrink-0"
             />
-            <div class="justify-between items-start gap-4 mb-3 min-w-0 flex-1 overflow-hidden">
+            <div class="flex flex-col justify-between items-start gap-3 mb-3 min-w-0 flex-1 overflow-hidden">
               <p
                 @click="handleClick(job.id)"
                 class="!text-[16px] font-semibold text-red-700 leading-tight hover:cursor-pointer"
@@ -63,7 +63,7 @@
               </div>
             </div>
           </div>
-          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] mb-4">
+          <div class="flex flex-wrap items-center gap-3 text-[12px] mb-4">
             <div class="flex gap-[8px] items-center">
               <font-awesome-icon
                 :icon="['fas', 'money-bill']"
@@ -71,8 +71,8 @@
               />
               <span>{{ formatSalary(job.salary) }}</span>
             </div>
-            <div class="flex items-center truncate gap-1">
-              <span class="truncate max-w-[160px]">{{ job.province }}</span>
+            <div class="flex items-center gap-1 min-w-0">
+              <span class="truncate max-w-[140px]">{{ job.province }}</span>
             </div>
             <div class="flex items-center">
               <font-awesome-icon
@@ -90,11 +90,8 @@
 
           <button
             @click.stop="toggleFavorite(job.id)"
-            class="absolute w-[32px] top-4 h-[32px] right-4 flex justify-center items-center rounded border border-gray-200 hover:border-red-400 transition-colors"
-            :class="{
-              'text-red-500 bg-red-50': isFavorite(job.id),
-              'text-gray-400': !isFavorite(job.id),
-            }"
+            class="absolute top-4 right-4 favorite-heart-btn"
+            :class="isFavorite(job.id) ? 'favorite-heart-btn--active' : 'favorite-heart-btn--idle'"
           >
             <font-awesome-icon
               :icon="['fas', 'heart']"

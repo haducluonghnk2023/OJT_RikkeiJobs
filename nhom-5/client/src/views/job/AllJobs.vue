@@ -141,25 +141,58 @@
     </div>
 
     <hr class="my-4 sm:my-6 border-gray-200" />
+    <div v-if="isLoadingJobs" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div
+        v-for="idx in 9"
+        :key="`job-skeleton-${idx}`"
+        class="bg-white/80 rounded-2xl border border-white/80 p-4 sm:p-5"
+      >
+        <div class="flex gap-4">
+          <div class="w-20 h-20 rounded-lg bg-slate-200 skeleton-shimmer"></div>
+          <div class="flex-1 space-y-2">
+            <div class="h-5 w-5/6 rounded bg-slate-200 skeleton-shimmer"></div>
+            <div class="h-4 w-2/3 rounded bg-slate-200 skeleton-shimmer"></div>
+            <div class="h-4 w-1/2 rounded bg-slate-200 skeleton-shimmer"></div>
+          </div>
+        </div>
+        <div class="space-y-2 mt-4">
+          <div class="h-4 w-full rounded bg-slate-200 skeleton-shimmer"></div>
+          <div class="h-4 w-4/5 rounded bg-slate-200 skeleton-shimmer"></div>
+        </div>
+      </div>
+    </div>
+    <div
+      v-else-if="paginatedJobsWithDaysLeft.length === 0"
+      class="empty-state-card p-8 text-center"
+    >
+      <p class="text-lg font-semibold text-slate-800">Không tìm thấy việc làm phù hợp</p>
+      <p class="text-sm text-slate-500 mt-1">
+        Hãy thử làm mới bộ lọc hoặc mở rộng phạm vi tìm kiếm.
+      </p>
+      <button class="gradient-btn mt-4 px-4 h-10 rounded-xl font-medium" @click="refesh">
+        Xóa bộ lọc
+      </button>
+    </div>
     <!-- ---------------------------s------- -->
     <!-- Grid view: giống trang home -->
     <div
-      v-if="!isSorted"
+      v-else-if="!isSorted"
       class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
     >
       <div
         v-for="(job, index) in paginatedJobsWithDaysLeft"
         :key="index"
-        class="w-full min-w-0"
+        class="w-full min-w-0 stagger-item"
+        :style="{ '--i': index }"
       >
-        <div class="bg-white w-full rounded-lg shadow-md border border-gray-200 p-4 sm:p-5 hover:shadow-lg transition-shadow relative overflow-hidden h-full flex flex-col">
-          <div class="flex gap-5">
+        <div class="bg-white w-full rounded-2xl shadow-md border border-white/80 p-4 sm:p-5 hover:shadow-lg transition-all duration-300 relative overflow-hidden h-full flex flex-col lift-hover">
+          <div class="flex items-start gap-4">
             <img
               :src="job.image"
               alt=""
               class="rounded-md object-cover w-20 h-20 shrink-0"
             />
-            <div class="justify-between items-start gap-4 mb-3 min-w-0 flex-1 overflow-hidden">
+            <div class="flex flex-col justify-between items-start gap-3 mb-3 min-w-0 flex-1 overflow-hidden">
               <p
                 @click="handleClickA(job.id)"
                 class="!text-[16px] font-semibold text-red-700 leading-tight hover:cursor-pointer"
@@ -186,16 +219,16 @@
               </div>
             </div>
           </div>
-          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 m-0 p-0 text-[12px] mb-4 min-w-0">
+          <div class="flex flex-wrap items-center gap-3 m-0 p-0 text-[12px] mb-4 min-w-0">
             <div class="flex gap-[8px] items-center">
               <font-awesome-icon :icon="['fas', 'money-bill']" class="text-[rgba(188,34,40,1)]" />
               <span class="truncate max-w-[140px]">{{ formatSalary(job.salary) }}</span>
             </div>
-            <div class="flex items-center truncate gap-1 max-w-[120px]">
+            <div class="flex items-center gap-1 min-w-0">
               <span class="w-4 h-4 shrink-0 flex items-center justify-center rounded-full overflow-hidden">
                 <img v-if="vietnamProvinces.includes(job.province)" class="w-2 h-2" :src="vnSvg" alt="" />
               </span>
-              <span class="truncate">{{ job.province?.replace(/^Thành phố\s*|^Tỉnh\s*/, "") }}</span>
+              <span class="truncate max-w-[140px]">{{ job.province?.replace(/^Thành phố\s*|^Tỉnh\s*/, "") }}</span>
             </div>
             <div class="flex items-center">
               <font-awesome-icon :icon="['fas', 'briefcase']" class="text-[rgba(188,34,40,1)] mr-1 shrink-0" />
@@ -210,11 +243,8 @@
           <button
             type="button"
             @click.stop="toggleFavorite(job.id)"
-            class="absolute w-[32px] top-4 h-[32px] right-4 flex justify-center items-center rounded border transition-colors"
-            :class="{
-              'text-red-500 bg-red-50 border-red-200': isFavorite(job.id),
-              'text-gray-400 hover:text-gray-600 border-[rgba(221,221,221,1)]': !isFavorite(job.id),
-            }"
+            class="absolute top-4 right-4 favorite-heart-btn"
+            :class="isFavorite(job.id) ? 'favorite-heart-btn--active' : 'favorite-heart-btn--idle'"
           >
             <font-awesome-icon :icon="['fas', 'heart']" :class="isFavorite(job.id) ? 'text-red-500' : 'text-[rgba(221,221,221,1)]'" />
           </button>
@@ -226,7 +256,8 @@
       <div
         v-for="(job, index) in paginatedJobsWithDaysLeft"
         :key="index"
-        class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 sm:p-5 rounded-lg border-2 border-gray-200 min-w-0"
+        class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 sm:p-5 rounded-2xl border border-white/80 bg-white/85 backdrop-blur min-w-0 lift-hover stagger-item"
+        :style="{ '--i': index }"
       >
         <div class="flex flex-1 min-w-0 gap-4">
           <img
@@ -296,11 +327,8 @@
           <button
             type="button"
             @click.stop="toggleFavorite(job.id)"
-            class="w-10 h-10 flex justify-center items-center rounded-md border-2 transition-colors shrink-0"
-            :class="{
-              'text-red-500 bg-red-50 border-red-300': isFavorite(job.id),
-              'text-gray-400 hover:text-gray-600 border-gray-300': !isFavorite(job.id),
-            }"
+            class="favorite-heart-btn w-10 h-10 rounded-md border-2 shrink-0"
+            :class="isFavorite(job.id) ? 'favorite-heart-btn--active' : 'favorite-heart-btn--idle'"
           >
             <font-awesome-icon :icon="['fas', 'heart']" :class="isFavorite(job.id) ? 'text-red-500' : ''" />
           </button>
@@ -308,7 +336,7 @@
       </div>
     </div>
 
-    <div class="flex flex-wrap items-center justify-center sm:justify-end gap-2 mt-6 pb-8">
+    <div v-if="!isLoadingJobs" class="flex flex-wrap items-center justify-center sm:justify-end gap-2 mt-6 pb-8">
       <button
         @click="changePage(currentPage - 1)"
         v-if="currentPage > 1"
@@ -369,6 +397,7 @@ const showDropdown = ref(false);
 const showDropdownId = ref(false);
 const isSorted = ref(false);
 const isExpanded = ref(false);
+const isLoadingJobs = ref(true);
 
 const jobItems = ref([]);
 const toggleExpanded = () => {
@@ -393,13 +422,18 @@ const syncQueryToUrl = (query) => {
 
 const applyFilters = async () => {
   const query = buildQuery();
-  // Always start from page 1 when filters change
-  store.commit("SET_PAGE", 1);
-  await store.dispatch("searchJobs", query);
-  syncQueryToUrl(query);
-  nextTick(() => {
-    jobItems.value[0]?.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
+  isLoadingJobs.value = true;
+  try {
+    // Always start from page 1 when filters change
+    store.commit("SET_PAGE", 1);
+    await store.dispatch("searchJobs", query);
+    syncQueryToUrl(query);
+    nextTick(() => {
+      jobItems.value[0]?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  } finally {
+    isLoadingJobs.value = false;
+  }
 };
 
 const applyFiltersDebounced = () => {
@@ -409,9 +443,9 @@ const applyFiltersDebounced = () => {
   }, 350);
 };
 
-const applyFiltersNow = () => {
+const applyFiltersNow = async () => {
   if (filterTimer) clearTimeout(filterTimer);
-  applyFilters();
+  await applyFilters();
 };
 const changeDisplay = () => {
   isSorted.value = true;
@@ -484,8 +518,6 @@ const vietnamProvinces = computed(() => {
   return store.state.provinces.provinces.map((province) => province.name);
 });
 
-console.log(store);
-
 const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value;
 };
@@ -528,12 +560,16 @@ const refesh = () => {
   applyFiltersNow();
 };
 
-const changePage = (page) => {
+const changePage = async (page) => {
   if (page === "...") return;
-  store.commit("SET_PAGE", page);
-  nextTick(() => {
+  isLoadingJobs.value = true;
+  try {
+    store.commit("SET_PAGE", page);
+    await nextTick();
     jobItems.value[0]?.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
+  } finally {
+    isLoadingJobs.value = false;
+  }
 };
 
 const pageSize = computed(() => store.state.jobs.limit || 9);
@@ -544,14 +580,21 @@ const paginatedJobsWithDaysLeft = computed(() => {
 });
 
 onMounted(async () => {
-  // Load full list once so filtering is correct across all jobs
-  await store.dispatch("getAllJobs");
-  store.dispatch("filteredIndustry");
-  store.dispatch("getAllProvince");
-  jobItems.value = jobsWithDaysLeft.value;
-  // Apply initial query (if any) without requiring a button click
-  if (pQ.value || selectedIndustries.value || selectedProvince.value) {
-    applyFiltersNow();
+  isLoadingJobs.value = true;
+  try {
+    // Load full list once so filtering is correct across all jobs
+    await store.dispatch("getAllJobs");
+    await Promise.all([
+      store.dispatch("filteredIndustry"),
+      store.dispatch("getAllProvince"),
+    ]);
+    jobItems.value = jobsWithDaysLeft.value;
+    // Apply initial query (if any) without requiring a button click
+    if (pQ.value || selectedIndustries.value || selectedProvince.value) {
+      await applyFiltersNow();
+    }
+  } finally {
+    isLoadingJobs.value = false;
   }
 });
 </script>

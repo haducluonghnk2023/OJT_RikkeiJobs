@@ -95,17 +95,17 @@
     <div class="mt-6">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div class="w-full min-w-0" v-for="(job, index) in jobsWithDaysLeft" :key="job?.id ?? index">
-          <div class="bg-white w-full rounded-lg shadow-md border border-gray-200 p-4 sm:p-5 hover:shadow-lg transition-shadow relative overflow-hidden">
-            <div class="flex gap-5">
+          <div class="group bg-white/90 backdrop-blur-sm w-full rounded-2xl border border-white/80 p-4 sm:p-5 relative overflow-hidden h-full flex flex-col shadow-[0_8px_24px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(15,23,42,0.14)]">
+            <div class="flex items-start gap-3.5">
               <img
                 :src="job.image"
                 alt="Job Image for Software Engineer"
-                class="rounded-md object-cover mb-4 w-20 h-20 shrink-0"
+                class="rounded-xl object-cover w-[88px] h-[88px] shrink-0 border border-slate-100"
               />
-              <div class="justify-between items-start gap-4 mb-3 min-w-0 flex-1 overflow-hidden">
+              <div class="flex flex-col justify-between items-start gap-3 mb-3 min-w-0 flex-1 overflow-hidden pr-10">
                 <p
                   @click="handleClick(job.id)"
-                  class="!text-[16px] font-semibold text-red-700 leading-tight hover:cursor-pointer"
+                  class="!text-[17px] font-semibold text-red-700 leading-tight hover:cursor-pointer"
                 >
                   <span class="line-clamp-2">{{ job.title }}</span>
                 </p>
@@ -117,7 +117,7 @@
                       : job?.rank?.slice(0, 3)"
                     :key="eduIndex"
                     :class="[
-                      'px-3 h-[26px] rounded-xl flex justify-center items-center text-[14px] font-semibold',
+                      'px-3 h-7 rounded-xl flex justify-center items-center text-[13px] font-semibold',
                       {
                         'bg-[rgba(236,253,243,1)] text-[rgba(2,122,72,1)]':
                           rank === 'Fresher',
@@ -144,7 +144,7 @@
                 </div>
               </div>
             </div>
-            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 m-0 p-0 text-[12px] mb-4 min-w-0">
+            <div class="flex flex-wrap items-center gap-3 m-0 p-0 text-[12px] mb-3 min-w-0 text-slate-700">
               <div
                 class="flex gap-[8px] items-center w-auto h-[18px] font-semibold"
               >
@@ -158,7 +158,7 @@
                   {{ formatSalary(job.salary) }}
                 </span>
               </div>
-              <div class="flex items-center truncate gap-1">
+              <div class="flex items-center gap-1 min-w-0">
                 <span
                   class="w-[16px] h-[16px] bg-[rgba(240,240,240,1)] flex items-center justify-center rounded-full"
                 >
@@ -173,7 +173,7 @@
                   </div>
                 </span>
 
-                <div class="truncate max-w-[160px]">
+                <div class="truncate max-w-[140px]">
                   {{ job.province }}
                 </div>
               </div>
@@ -189,7 +189,7 @@
             </div>
             <p
               v-if="jobsWithDaysLeft"
-              class="text-gray-500 text-[12px] leading-tight"
+              class="text-gray-500 text-[12px] leading-tight mt-auto pt-3 border-t border-slate-100"
             >
               Cập nhật {{ job.timeAgo }} - Còn
               <span class="font-semibold text-black">{{ job.daysLeft }}</span>
@@ -199,11 +199,8 @@
             <button
               @click.stop="toggleFavorite(job.id)"
               type="button"
-              class="absolute w-[32px] top-4 h-[32px] flex justify-center items-center right-4 rounded border heart transition-colors"
-              :class="{
-                'text-red-500 bg-red-50 border-red-200': isFavorite(job.id),
-                'text-gray-400 hover:text-gray-600 border-[rgba(221,221,221,1)]': !isFavorite(job.id),
-              }"
+              class="absolute top-5 right-5 favorite-heart-btn"
+              :class="isFavorite(job.id) ? 'favorite-heart-btn--active' : 'favorite-heart-btn--idle'"
             >
               <font-awesome-icon
                 :icon="['fas', 'heart']"

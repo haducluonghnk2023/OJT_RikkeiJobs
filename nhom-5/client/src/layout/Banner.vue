@@ -1,45 +1,34 @@
 <template>
   <div
-    class="relative min-h-[320px] sm:min-h-[380px] lg:min-h-[435px] flex items-center justify-center text-white"
+    class="relative min-h-[320px] sm:min-h-[380px] lg:min-h-[435px] flex items-center justify-center text-white rounded-[26px] overflow-hidden border border-white/35 shadow-[0_20px_45px_rgba(16,24,40,0.16)]"
   >
     <div
-      class="absolute inset-0 bg-cover bg-center image-banner"
-      style="
-        background-image: url('https://s3-alpha-sig.figma.com/img/acee/2e78/87d12368bef93dfc7b5f89b9927a3239?Expires=1733097600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=n2WBOO-jge3EiwZdCvHqp2c5yI9tWsKIo8gmt9KOreY-yAp9R5Wr8WKsNmUlOJ9ACao6fVkJkpqwrqMUdGOkacM49eBwUzyAEVQs~BGZeNUcY~9VpBw0np2B8jfW-G~dD7VQ0LSKolllLeqeNGUa0ClRXIo9jN8F0rBcLv0bYhop53HqhOPtnM-b0CNH6poj4JEXxAUiiIcGIWzpk-m1loUqin8VHG~PD4cP2lgO09ffCbDvG5M8kJiZVbS6ahDUzEe9zAmDwRcrH-C-nU0XVVtGz2HTrVPmSzGtNBqLVAPD6l-TBhqIqLZJqPX-OljsnT2SV1nsJF9zEvLjlrLRnA__');
-        background-position: top center;
-        background-size: 100% 155%;
-        height: 100%;
-      "
+      class="absolute inset-0 bg-cover bg-center"
+      :style="{ backgroundImage: `url(${bannerImage})` }"
     ></div>
+    <div class="absolute inset-0 banner-overlay"></div>
 
-    <div class="absolute inset-0 bg-black opacity-50"></div>
-
-    <!-- Nội dung phía trước -->
     <div class="relative flex flex-col items-center gap-6 w-full px-4">
-      <!-- Tiêu đề -->
-      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold m-0 max-w-4xl text-center">
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold m-0 max-w-4xl text-center drop-shadow-sm">
         Tìm kiếm việc làm cùng Rikkei Jobs!
       </h1>
 
-      <!-- Khung tìm kiếm -->
       <div
-        class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-6 p-2 rounded-lg w-full max-w-4xl"
+        class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 p-3 rounded-2xl w-full max-w-4xl bg-white/12 backdrop-blur-md border border-white/35 shadow-lg"
       >
-        <!-- Ô tìm kiếm vị trí -->
         <div class="gap-3 flex flex-col sm:flex-row w-full">
-          <div class="flex items-center bg-gray-100 p-2 rounded-lg w-full h-12">
+          <div class="flex items-center bg-white p-2 rounded-xl w-full h-12 shadow-sm">
             <SearchOutlined class="text-gray-500 w-5 h-5" />
             <input
               type="text"
               placeholder="Vị trí ứng tuyển"
-              class="bg-gray-100 text-gray-700 outline-none ml-2 w-full min-w-0"
+              class="text-gray-700 outline-none ml-2 w-full min-w-0 bg-transparent"
               v-model="positionQuery"
             />
           </div>
 
-          <!-- Dropdown chọn địa điểm -->
           <div
-            class="relative flex bg-gray-100 p-2 rounded-lg w-full sm:w-60 h-12 items-center justify-between"
+            class="relative flex bg-white p-2 rounded-xl w-full sm:w-60 h-12 items-center justify-between shadow-sm"
           >
             <div class="flex items-center min-w-0">
               <EnvironmentOutlined class="text-gray-500 w-5 h-5" />
@@ -47,26 +36,22 @@
                 {{ selectedProvince || "Tất cả địa điểm" }}
               </p>
             </div>
-            <DownOutlined
-              class="text-gray-800 mr-3 cursor-pointer"
-              @click="toggleDropdown"
-            />
+            <DownOutlined class="text-gray-800 mr-2 cursor-pointer" @click="toggleDropdown" />
 
-            <!-- Danh sách tỉnh thành -->
             <ul
               v-if="showDropdown"
-              class="absolute left-0 top-full mt-2 bg-white text-black w-full shadow-lg rounded-lg z-10 overflow-y-auto max-h-60"
+              class="absolute left-0 top-full mt-2 bg-white text-black w-full shadow-xl rounded-xl z-10 overflow-y-auto max-h-60 border border-slate-100"
             >
               <input
                 type="text"
-                placeholder="Tìm kiếm "
+                placeholder="Tìm kiếm"
                 class="w-full px-3 py-2 outline-none border-b"
                 v-model="searchQuery"
               />
               <li
                 v-for="(item, index) in filteredProvinces"
                 :key="index"
-                class="p-2 hover:bg-gray-200 cursor-pointer"
+                class="p-2 hover:bg-gray-100 cursor-pointer"
                 @click="selectProvince(item.name)"
               >
                 {{ item.name }}
@@ -75,10 +60,9 @@
           </div>
         </div>
 
-        <!-- Nút tìm kiếm -->
         <button
           @click="searchPosition"
-          class="bg-red-600 text-white px-6 py-2 rounded-lg w-full sm:w-36 h-12 hover:bg-red-700"
+          class="gradient-btn px-6 py-2 rounded-xl w-full sm:w-36 h-12 font-semibold shadow-sm"
         >
           Tìm kiếm
         </button>
@@ -96,6 +80,7 @@ import {
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
+import bannerImage from "@/assets/banner/banner_img.svg";
 
 const router = useRouter();
 const store = useStore();
@@ -145,12 +130,11 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.image-banner {
-  background-image: linear-gradient(
-      to bottom,
-      rgba(25, 16, 58, 0.7),
-      rgba(25, 16, 58, 0.4)
-    ),
-    url("https://s3-alpha-sig.figma.com/img/acee/2e78/87d12368bef93dfc7b5f89b9927a3239?Expires=1733097600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=n2WBOO-jge3EiwZdCvHqp2c5yI9tWsKIo8gmt9KOreY-yAp9R5Wr8WKsNmUlOJ9ACao6fVkJkpqwrqMUdGOkacM49eBwUzyAEVQs~BGZeNUcY~9VpBw0np2B8jfW-G~dD7VQ0LSKolllLeqeNGUa0ClRXIo9jN8F0rBcLv0bYhop53HqhOPtnM-b0CNH6poj4JEXxAUiiIcGIWzpk-m1loUqin8VHG~PD4cP2lgO09ffCbDvG5M8kJiZVbS6ahDUzEe9zAmDwRcrH-C-nU0XVVtGz2HTrVPmSzGtNBqLVAPD6l-TBhqIqLZJqPX-OljsnT2SV1nsJF9zEvLjlrLRnA__");
+.banner-overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(16, 24, 40, 0.25) 0%,
+    rgba(16, 24, 40, 0.45) 100%
+  );
 }
 </style>
