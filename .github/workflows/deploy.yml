@@ -25,27 +25,27 @@ jobs:
 
       - name: Build Backend Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/rikkei-backend:latest ./DB_RikkeiJobs
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/rikkei-backend-ojt:latest ./DB_RikkeiJobs
 
       - name: Build Frontend Client Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/rikkei-client:latest ./nhom-5/client
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/rikkei-client-ojt:latest ./nhom-5/client
 
       - name: Build Frontend Admin Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/rikkei-admin:latest ./nhom-5/client_admin
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/rikkei-admin-ojt:latest ./nhom-5/client_admin
 
       - name: Push Backend Image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/rikkei-backend:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/rikkei-backend-ojt:latest
 
       - name: Push Frontend Client Image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/rikkei-client:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/rikkei-client-ojt:latest
 
       - name: Push Frontend Admin Image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/rikkei-admin:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/rikkei-admin-ojt:latest
 
   deploy:
     needs: build
