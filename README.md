@@ -38,7 +38,7 @@ RikkeiJobs là một hệ thống quản lý tuyển dụng hoàn chỉnh bao g�
 
 ### Backend
 
-- **Framework**: Spring Boot 3.3.5
+- **Framework**: Spring Boot 3.3.5 aaa
 - **Java**: JDK 21 (theo `DB_RikkeiJobs/build.gradle`)
 - **Build Tool**: Gradle
 - **Database**: MySQL 8.0+
