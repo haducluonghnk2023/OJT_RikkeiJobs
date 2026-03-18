@@ -1,7 +1,13 @@
 package com.data.db_rikkeijobs.service.impl;
 
+import com.data.db_rikkeijobs.dto.request.CreateInterviewBookingRequest;
+import com.data.db_rikkeijobs.dto.request.UpdateInterviewBookingRequest;
+import com.data.db_rikkeijobs.dto.response.InterviewBookingResponse;
 import com.data.db_rikkeijobs.entity.InterviewBooking;
 import com.data.db_rikkeijobs.entity.InterviewBookingStatus;
+import com.data.db_rikkeijobs.exception.HttpBadRequest;
+import com.data.db_rikkeijobs.exception.HttpNotFound;
+import com.data.db_rikkeijobs.mapper.InterviewBookingMapper;
 import com.data.db_rikkeijobs.repository.InterviewBookingRepository;
 import com.data.db_rikkeijobs.service.InterviewBookingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -17,6 +24,9 @@ public class InterviewBookingServiceImpl implements InterviewBookingService {
     
     @Autowired
     private InterviewBookingRepository interviewBookingRepository;
+
+    @Autowired
+    private InterviewBookingMapper interviewBookingMapper;
     
     @Override
     public List<InterviewBooking> findAll() {
@@ -83,6 +93,89 @@ public class InterviewBookingServiceImpl implements InterviewBookingService {
     
     @Override
     public void deleteById(Long id) {
+        interviewBookingRepository.deleteById(id);
+    }
+
+    @Override
+    public List<InterviewBookingResponse> getAllInterviewBookingResponses() {
+        return interviewBookingRepository.findAll().stream()
+                .map(interviewBookingMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public InterviewBookingResponse getInterviewBookingResponseById(Long id) {
+        return interviewBookingRepository.findById(id)
+                .map(interviewBookingMapper::toResponse)
+                .orElseThrow(() -> new HttpNotFound("Interview booking not found with id: " + id));
+    }
+
+    @Override
+    public List<InterviewBookingResponse> getInterviewBookingResponsesByUserId(Long userId) {
+        return interviewBookingRepository.findByUserId(userId).stream()
+                .map(interviewBookingMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<InterviewBookingResponse> getInterviewBookingResponsesByEnterpriseId(Long enterpriseId) {
+        return interviewBookingRepository.findByEnterpriseId(enterpriseId).stream()
+                .map(interviewBookingMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<InterviewBookingResponse> getInterviewBookingResponsesByJobId(Long jobId) {
+        return interviewBookingRepository.findByJobId(jobId).stream()
+                .map(interviewBookingMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<InterviewBookingResponse> getInterviewBookingResponsesByStatus(InterviewBookingStatus status) {
+        return interviewBookingRepository.findByStatus(status).stream()
+                .map(interviewBookingMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<InterviewBookingResponse> getInterviewBookingResponsesByStatusString(String status) {
+        InterviewBookingStatus parsedStatus;
+        try {
+            parsedStatus = InterviewBookingStatus.fromJson(status);
+        } catch (IllegalArgumentException ex) {
+            throw new HttpBadRequest(ex.getMessage());
+        }
+        return getInterviewBookingResponsesByStatus(parsedStatus);
+    }
+
+    @Override
+    public InterviewBookingResponse createInterviewBooking(CreateInterviewBookingRequest request) {
+        InterviewBooking interviewBooking = interviewBookingMapper.toEntity(request);
+        return interviewBookingMapper.toResponse(save(interviewBooking));
+    }
+
+    @Override
+    public InterviewBookingResponse updateInterviewBooking(Long id, UpdateInterviewBookingRequest request) {
+        InterviewBooking existing = interviewBookingRepository.findById(id)
+                .orElseThrow(() -> new HttpNotFound("Interview booking not found with id: " + id));
+        interviewBookingMapper.updateEntityFromRequest(request, existing);
+        return interviewBookingMapper.toResponse(update(id, existing));
+    }
+
+    @Override
+    public InterviewBookingResponse patchInterviewBooking(Long id, UpdateInterviewBookingRequest request) {
+        InterviewBooking existing = interviewBookingRepository.findById(id)
+                .orElseThrow(() -> new HttpNotFound("Interview booking not found with id: " + id));
+        interviewBookingMapper.updateEntityFromRequest(request, existing);
+        return interviewBookingMapper.toResponse(update(id, existing));
+    }
+
+    @Override
+    public void deleteInterviewBookingOrThrow(Long id) {
+        if (!interviewBookingRepository.existsById(id)) {
+            throw new HttpNotFound("Interview booking not found with id: " + id);
+        }
         interviewBookingRepository.deleteById(id);
     }
 }

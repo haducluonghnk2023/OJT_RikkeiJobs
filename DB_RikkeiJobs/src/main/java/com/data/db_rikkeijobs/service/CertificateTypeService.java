@@ -1,5 +1,7 @@
 package com.data.db_rikkeijobs.service;
 
+import com.data.db_rikkeijobs.dto.request.CreateCertificateTypeRequest;
+import com.data.db_rikkeijobs.dto.request.UpdateCertificateTypeRequest;
 import com.data.db_rikkeijobs.entity.CertificateType;
 
 import java.util.List;
@@ -11,5 +13,10 @@ public interface CertificateTypeService {
     CertificateType save(CertificateType certificateType);
     CertificateType update(Long id, CertificateType certificateType);
     void deleteById(Long id);
+
+    CertificateType getCertificateTypeByIdOrThrow(Long id);
+    CertificateType createCertificateType(CreateCertificateTypeRequest request);
+    CertificateType updateCertificateType(Long id, UpdateCertificateTypeRequest request);
+    void deleteCertificateTypeOrThrow(Long id);
 }
 

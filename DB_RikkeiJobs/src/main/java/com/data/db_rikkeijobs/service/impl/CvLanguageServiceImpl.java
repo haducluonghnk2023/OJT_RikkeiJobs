@@ -1,6 +1,8 @@
 package com.data.db_rikkeijobs.service.impl;
 
+import com.data.db_rikkeijobs.dto.request.UpdateCvLanguageRequest;
 import com.data.db_rikkeijobs.entity.CvLanguage;
+import com.data.db_rikkeijobs.exception.HttpNotFound;
 import com.data.db_rikkeijobs.repository.CvLanguageRepository;
 import com.data.db_rikkeijobs.service.CvLanguageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +54,29 @@ public class CvLanguageServiceImpl implements CvLanguageService {
     
     @Override
     public void deleteById(Long id) {
+        cvLanguageRepository.deleteById(id);
+    }
+
+    @Override
+    public CvLanguage getCvLanguageByIdOrThrow(Long id) {
+        return cvLanguageRepository.findById(id)
+                .orElseThrow(() -> new HttpNotFound("CV language not found with id: " + id));
+    }
+
+    @Override
+    public CvLanguage updateCvLanguage(Long id, UpdateCvLanguageRequest request) {
+        CvLanguage existing = getCvLanguageByIdOrThrow(id);
+        if (request.getLanguage() != null) existing.setLanguage(request.getLanguage());
+        if (request.getCode() != null) existing.setCode(request.getCode());
+        if (request.getStatus() != null) existing.setStatus(request.getStatus());
+        return update(id, existing);
+    }
+
+    @Override
+    public void deleteCvLanguageOrThrow(Long id) {
+        if (!cvLanguageRepository.existsById(id)) {
+            throw new HttpNotFound("CV language not found with id: " + id);
+        }
         cvLanguageRepository.deleteById(id);
     }
 }

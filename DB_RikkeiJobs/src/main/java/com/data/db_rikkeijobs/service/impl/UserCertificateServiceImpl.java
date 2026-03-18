@@ -1,6 +1,11 @@
 package com.data.db_rikkeijobs.service.impl;
 
+import com.data.db_rikkeijobs.dto.request.CreateUserCertificateRequest;
+import com.data.db_rikkeijobs.dto.request.UpdateUserCertificateRequest;
+import com.data.db_rikkeijobs.dto.response.UserCertificateResponse;
 import com.data.db_rikkeijobs.entity.UserCertificate;
+import com.data.db_rikkeijobs.exception.HttpNotFound;
+import com.data.db_rikkeijobs.mapper.UserCertificateMapper;
 import com.data.db_rikkeijobs.repository.UserCertificateRepository;
 import com.data.db_rikkeijobs.service.UserCertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -16,6 +22,9 @@ public class UserCertificateServiceImpl implements UserCertificateService {
     
     @Autowired
     private UserCertificateRepository userCertificateRepository;
+
+    @Autowired
+    private UserCertificateMapper userCertificateMapper;
     
     @Override
     public List<UserCertificate> findAll() {
@@ -60,6 +69,49 @@ public class UserCertificateServiceImpl implements UserCertificateService {
     
     @Override
     public void deleteById(Long id) {
+        userCertificateRepository.deleteById(id);
+    }
+
+    @Override
+    public List<UserCertificateResponse> getUserCertificateResponses(Long userId, Long certificateId) {
+        List<UserCertificate> list;
+        if (userId != null) {
+            list = userCertificateRepository.findByUserId(userId);
+        } else if (certificateId != null) {
+            list = userCertificateRepository.findByCertificateId(certificateId);
+        } else {
+            list = userCertificateRepository.findAll();
+        }
+        return list.stream().map(userCertificateMapper::toResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public UserCertificateResponse getUserCertificateResponseById(Long id) {
+        return userCertificateRepository.findById(id)
+                .map(userCertificateMapper::toResponse)
+                .orElseThrow(() -> new HttpNotFound("UserCertificate not found with id: " + id));
+    }
+
+    @Override
+    public UserCertificateResponse createUserCertificate(CreateUserCertificateRequest request) {
+        UserCertificate created = save(userCertificateMapper.toEntity(request));
+        return userCertificateMapper.toResponse(created);
+    }
+
+    @Override
+    public UserCertificateResponse patchUserCertificate(Long id, UpdateUserCertificateRequest request) {
+        UserCertificate existing = userCertificateRepository.findById(id)
+                .orElseThrow(() -> new HttpNotFound("UserCertificate not found with id: " + id));
+        userCertificateMapper.updateEntityFromRequest(request, existing);
+        UserCertificate updated = update(id, existing);
+        return userCertificateMapper.toResponse(updated);
+    }
+
+    @Override
+    public void deleteUserCertificateOrThrow(Long id) {
+        if (!userCertificateRepository.existsById(id)) {
+            throw new HttpNotFound("UserCertificate not found with id: " + id);
+        }
         userCertificateRepository.deleteById(id);
     }
 }

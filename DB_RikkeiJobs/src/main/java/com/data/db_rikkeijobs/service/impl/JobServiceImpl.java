@@ -1,10 +1,15 @@
 package com.data.db_rikkeijobs.service.impl;
 
+import com.data.db_rikkeijobs.dto.request.CreateJobRequest;
+import com.data.db_rikkeijobs.dto.request.UpdateJobRequest;
+import com.data.db_rikkeijobs.dto.response.JobResponse;
 import com.data.db_rikkeijobs.entity.Job;
 import com.data.db_rikkeijobs.entity.JobBenefit;
 import com.data.db_rikkeijobs.entity.JobDescription;
 import com.data.db_rikkeijobs.entity.JobRank;
 import com.data.db_rikkeijobs.entity.JobRequirement;
+import com.data.db_rikkeijobs.exception.HttpNotFound;
+import com.data.db_rikkeijobs.mapper.JobMapper;
 import com.data.db_rikkeijobs.repository.JobRepository;
 import com.data.db_rikkeijobs.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +26,9 @@ public class JobServiceImpl implements JobService {
     
     @Autowired
     private JobRepository jobRepository;
+
+    @Autowired
+    private JobMapper jobMapper;
     
     @Override
     public List<Job> findAll() {
@@ -137,6 +145,69 @@ public class JobServiceImpl implements JobService {
     
     @Override
     public void deleteById(Long id) {
+        jobRepository.deleteById(id);
+    }
+
+    @Override
+    public List<JobResponse> getAllJobResponses() {
+        return jobRepository.findAll().stream().map(jobMapper::toResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public JobResponse getJobResponseById(Long id) {
+        return jobRepository.findById(id)
+                .map(jobMapper::toResponse)
+                .orElseThrow(() -> new HttpNotFound("Job not found with id: " + id));
+    }
+
+    @Override
+    public List<JobResponse> getJobResponsesByEnterpriseId(Long enterpriseId) {
+        return jobRepository.findByEnterpriseId(enterpriseId).stream()
+                .map(jobMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<JobResponse> getJobResponsesByIndustry(String industry) {
+        return jobRepository.findByIndustry(industry).stream()
+                .map(jobMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<JobResponse> getJobResponsesByFlight(String flight) {
+        return jobRepository.findByFlight(flight).stream()
+                .map(jobMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public JobResponse createJob(CreateJobRequest request) {
+        Job job = jobMapper.toEntity(request);
+        return jobMapper.toResponse(save(job));
+    }
+
+    @Override
+    public JobResponse updateJob(Long id, UpdateJobRequest request) {
+        Job existingJob = jobRepository.findById(id)
+                .orElseThrow(() -> new HttpNotFound("Job not found with id: " + id));
+        jobMapper.updateEntityFromRequest(request, existingJob);
+        return jobMapper.toResponse(update(id, existingJob));
+    }
+
+    @Override
+    public JobResponse patchJob(Long id, UpdateJobRequest request) {
+        Job existingJob = jobRepository.findById(id)
+                .orElseThrow(() -> new HttpNotFound("Job not found with id: " + id));
+        jobMapper.updateEntityFromRequest(request, existingJob);
+        return jobMapper.toResponse(update(id, existingJob));
+    }
+
+    @Override
+    public void deleteJobOrThrow(Long id) {
+        if (!jobRepository.existsById(id)) {
+            throw new HttpNotFound("Job not found with id: " + id);
+        }
         jobRepository.deleteById(id);
     }
 }

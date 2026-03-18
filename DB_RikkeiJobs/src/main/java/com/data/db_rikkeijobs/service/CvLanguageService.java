@@ -1,5 +1,6 @@
 package com.data.db_rikkeijobs.service;
 
+import com.data.db_rikkeijobs.dto.request.UpdateCvLanguageRequest;
 import com.data.db_rikkeijobs.entity.CvLanguage;
 
 import java.util.List;
@@ -12,5 +13,9 @@ public interface CvLanguageService {
     CvLanguage save(CvLanguage cvLanguage);
     CvLanguage update(Long id, CvLanguage cvLanguage);
     void deleteById(Long id);
+
+    CvLanguage getCvLanguageByIdOrThrow(Long id);
+    CvLanguage updateCvLanguage(Long id, UpdateCvLanguageRequest request);
+    void deleteCvLanguageOrThrow(Long id);
 }
 

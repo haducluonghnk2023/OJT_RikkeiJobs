@@ -1,6 +1,11 @@
 package com.data.db_rikkeijobs.service.impl;
 
+import com.data.db_rikkeijobs.dto.request.CreateCvRequest;
+import com.data.db_rikkeijobs.dto.request.UpdateCvRequest;
+import com.data.db_rikkeijobs.dto.response.CvResponse;
 import com.data.db_rikkeijobs.entity.Cv;
+import com.data.db_rikkeijobs.exception.HttpNotFound;
+import com.data.db_rikkeijobs.mapper.CvMapper;
 import com.data.db_rikkeijobs.repository.CvRepository;
 import com.data.db_rikkeijobs.service.CvService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -16,6 +22,9 @@ public class CvServiceImpl implements CvService {
     
     @Autowired
     private CvRepository cvRepository;
+
+    @Autowired
+    private CvMapper cvMapper;
     
     @Override
     public List<Cv> findAll() {
@@ -67,6 +76,40 @@ public class CvServiceImpl implements CvService {
     
     @Override
     public void deleteById(Long id) {
+        cvRepository.deleteById(id);
+    }
+
+    @Override
+    public List<CvResponse> getAllCvResponses() {
+        return cvRepository.findAll().stream().map(cvMapper::toResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public CvResponse getCvResponseById(Long id) {
+        return cvRepository.findById(id)
+                .map(cvMapper::toResponse)
+                .orElseThrow(() -> new HttpNotFound("CV not found with id: " + id));
+    }
+
+    @Override
+    public CvResponse createCv(CreateCvRequest request) {
+        Cv cv = cvMapper.toEntity(request);
+        return cvMapper.toResponse(save(cv));
+    }
+
+    @Override
+    public CvResponse patchCv(Long id, UpdateCvRequest request) {
+        Cv existingCv = cvRepository.findById(id)
+                .orElseThrow(() -> new HttpNotFound("CV not found with id: " + id));
+        cvMapper.updateEntityFromRequest(request, existingCv);
+        return cvMapper.toResponse(update(id, existingCv));
+    }
+
+    @Override
+    public void deleteCvOrThrow(Long id) {
+        if (!cvRepository.existsById(id)) {
+            throw new HttpNotFound("CV not found with id: " + id);
+        }
         cvRepository.deleteById(id);
     }
 }

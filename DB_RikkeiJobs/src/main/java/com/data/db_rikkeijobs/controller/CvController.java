@@ -2,10 +2,8 @@ package com.data.db_rikkeijobs.controller;
 
 import com.data.db_rikkeijobs.dto.request.CreateCvRequest;
 import com.data.db_rikkeijobs.dto.request.UpdateCvRequest;
-import com.data.db_rikkeijobs.dto.response.ResponseWrapper;
 import com.data.db_rikkeijobs.dto.response.CvResponse;
-import com.data.db_rikkeijobs.exception.HttpNotFound;
-import com.data.db_rikkeijobs.mapper.CvMapper;
+import com.data.db_rikkeijobs.dto.response.ResponseWrapper;
 import com.data.db_rikkeijobs.service.CvService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,87 +18,64 @@ import java.util.List;
 public class CvController {
 
     private final CvService cvService;
-    private final CvMapper cvMapper;
 
     @GetMapping
     public ResponseEntity<?> getAllCvs() {
-        List<CvResponse> cvs = cvService.findAll().stream()
-                .map(cvMapper::toResponse)
-                .toList();
-        
+        List<CvResponse> cvs = cvService.getAllCvResponses();
         return ResponseEntity.ok(
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
                         .code(HttpStatus.OK.value())
                         .data(cvs)
                         .message("CVs retrieved successfully")
-                        .build()
-        );
+                        .build());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getCvById(@PathVariable Long id) {
-        CvResponse cv = cvService.findById(id)
-                .map(cvMapper::toResponse)
-                .orElseThrow(() -> new HttpNotFound("CV not found with id: " + id));
-        
+        CvResponse cv = cvService.getCvResponseById(id);
         return ResponseEntity.ok(
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
                         .code(HttpStatus.OK.value())
                         .data(cv)
                         .message("CV retrieved successfully")
-                        .build()
-        );
+                        .build());
     }
 
     @PostMapping
     public ResponseEntity<?> createCv(@RequestBody CreateCvRequest request) {
-        CvResponse created = cvMapper.toResponse(cvService.save(cvMapper.toEntity(request)));
+        CvResponse created = cvService.createCv(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 ResponseWrapper.builder()
                         .status(HttpStatus.CREATED)
                         .code(HttpStatus.CREATED.value())
                         .data(created)
                         .message("CV created successfully")
-                        .build()
-        );
+                        .build());
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<?> patchCv(@PathVariable Long id, @RequestBody UpdateCvRequest request) {
-        var existingCv = cvService.findById(id)
-                .orElseThrow(() -> new HttpNotFound("CV not found with id: " + id));
-
-        cvMapper.updateEntityFromRequest(request, existingCv);
-        var updatedCv = cvMapper.toResponse(cvService.update(id, existingCv));
-        
+        CvResponse updatedCv = cvService.patchCv(id, request);
         return ResponseEntity.ok(
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
                         .code(HttpStatus.OK.value())
                         .data(updatedCv)
                         .message("CV updated successfully")
-                        .build()
-        );
+                        .build());
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCv(@PathVariable Long id) {
-        if (!cvService.findById(id).isPresent()) {
-            throw new HttpNotFound("CV not found with id: " + id);
-        }
-        
-        cvService.deleteById(id);
-        
+        cvService.deleteCvOrThrow(id);
         return ResponseEntity.ok(
                 ResponseWrapper.builder()
                         .status(HttpStatus.OK)
                         .code(HttpStatus.OK.value())
                         .data("CV deleted successfully")
                         .message("CV deleted successfully")
-                        .build()
-        );
+                        .build());
     }
 }
-

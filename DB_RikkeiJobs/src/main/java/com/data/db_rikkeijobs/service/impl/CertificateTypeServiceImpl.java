@@ -1,7 +1,11 @@
 package com.data.db_rikkeijobs.service.impl;
 
+import com.data.db_rikkeijobs.dto.request.CreateCertificateTypeRequest;
+import com.data.db_rikkeijobs.dto.request.UpdateCertificateTypeRequest;
 import com.data.db_rikkeijobs.entity.CertificateType;
 import com.data.db_rikkeijobs.entity.CertificateTypeValue;
+import com.data.db_rikkeijobs.exception.HttpNotFound;
+import com.data.db_rikkeijobs.mapper.CertificateTypeMapper;
 import com.data.db_rikkeijobs.repository.CertificateTypeRepository;
 import com.data.db_rikkeijobs.service.CertificateTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +22,9 @@ public class CertificateTypeServiceImpl implements CertificateTypeService {
     
     @Autowired
     private CertificateTypeRepository certificateTypeRepository;
+
+    @Autowired
+    private CertificateTypeMapper certificateTypeMapper;
     
     @Override
     public List<CertificateType> findAll() {
@@ -66,6 +73,32 @@ public class CertificateTypeServiceImpl implements CertificateTypeService {
     
     @Override
     public void deleteById(Long id) {
+        certificateTypeRepository.deleteById(id);
+    }
+
+    @Override
+    public CertificateType getCertificateTypeByIdOrThrow(Long id) {
+        return certificateTypeRepository.findById(id)
+                .orElseThrow(() -> new HttpNotFound("Certificate type not found with id: " + id));
+    }
+
+    @Override
+    public CertificateType createCertificateType(CreateCertificateTypeRequest request) {
+        return save(certificateTypeMapper.toEntity(request));
+    }
+
+    @Override
+    public CertificateType updateCertificateType(Long id, UpdateCertificateTypeRequest request) {
+        CertificateType existing = getCertificateTypeByIdOrThrow(id);
+        certificateTypeMapper.updateEntityFromRequest(request, existing);
+        return update(id, existing);
+    }
+
+    @Override
+    public void deleteCertificateTypeOrThrow(Long id) {
+        if (!certificateTypeRepository.existsById(id)) {
+            throw new HttpNotFound("Certificate type not found with id: " + id);
+        }
         certificateTypeRepository.deleteById(id);
     }
 }

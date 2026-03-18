@@ -1,5 +1,8 @@
 package com.data.db_rikkeijobs.service;
 
+import com.data.db_rikkeijobs.dto.request.CreateJobRequest;
+import com.data.db_rikkeijobs.dto.request.UpdateJobRequest;
+import com.data.db_rikkeijobs.dto.response.JobResponse;
 import com.data.db_rikkeijobs.entity.Job;
 
 import java.util.List;
@@ -14,5 +17,15 @@ public interface JobService {
     Job save(Job job);
     Job update(Long id, Job job);
     void deleteById(Long id);
+
+    List<JobResponse> getAllJobResponses();
+    JobResponse getJobResponseById(Long id);
+    List<JobResponse> getJobResponsesByEnterpriseId(Long enterpriseId);
+    List<JobResponse> getJobResponsesByIndustry(String industry);
+    List<JobResponse> getJobResponsesByFlight(String flight);
+    JobResponse createJob(CreateJobRequest request);
+    JobResponse updateJob(Long id, UpdateJobRequest request);
+    JobResponse patchJob(Long id, UpdateJobRequest request);
+    void deleteJobOrThrow(Long id);
 }
 
