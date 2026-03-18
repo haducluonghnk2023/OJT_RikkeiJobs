@@ -1,8 +1,8 @@
-version: '3.8'
+version: "3.8"
 
 services:
   backend:
-    image: ${DOCKER_USERNAME:-youruser}/rikkei-backend:latest
+    image: ${DOCKER_USERNAME:ducluong610}/rikkei-backend:latest
     restart: unless-stopped
     ports:
       - "8080:8080"
@@ -14,16 +14,16 @@ services:
       - mysql
 
   client:
-    image: ${DOCKER_USERNAME:-youruser}/rikkei-client:latest
+    image: ${DOCKER_USERNAME:ducluong610}/rikkei-client:latest
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "8888:80"
 
   admin:
-    image: ${DOCKER_USERNAME:-youruser}/rikkei-admin:latest
+    image: ${DOCKER_USERNAME:ducluong610}/rikkei-admin:latest
     restart: unless-stopped
     ports:
-      - "81:80"
+      - "8889:80"
 
   mysql:
     image: mysql:8.0
